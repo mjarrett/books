@@ -1,0 +1,9 @@
+<h1>Input new book</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'lib:input' %}" method="post">
+{% csrf_token %}
+<input type="text" name="book" id="book" value="" />
+<input type="submit" value="Submit" />
+</form>

@@ -18,5 +18,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^polls/', include('polls.urls')), #this adds the Polls app naming scheme
+    url(r'^lib/',include('lib.urls',namespace='lib')), #adds lib app naming scheme
     url(r'^admin/', admin.site.urls),
 ]

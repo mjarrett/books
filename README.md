@@ -12,3 +12,7 @@ https://www.googleapis.com/books/v1/volumes?q=pride+prejudice
 
 
 Currently following https://docs.djangoproject.com/en/1.10/intro/tutorial01/ to learn django
+Another tutorial: https://tutorial.djangogirls.org/en/
+
+
+This will eventually live at mikejarrett.ca/apps/lib, but not yet!
