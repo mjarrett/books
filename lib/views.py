@@ -3,21 +3,41 @@ from django.http import HttpResponse
 from django.views import generic
 
 from lib.models import Book
-
+import requests
+import json
 
 # Create your views here.
+def book_google_lookup(query):
+    url='https://www.googleapis.com/books/v1/volumes?q='+query
+    google_response = requests.get(url)
+    gr = google_response.text
+    return json.loads(gr)
+
 def index(request):
     return HttpResponse("Here's where the main page of the family library will be")
 
+def addbook(request,isbn):
+    print(request)
+    grj = book_google_lookup('isbn:'+ isbn)
+    b = Book(isbn=isbn, author=grj['items'][0]['volumeInfo']['authors'][0],title=grj['items'][0]['volumeInfo']['title'])
+    b.save()
+    return BooksView.as_view()(request)
+
 def input(request):
     #return HttpResponse("Here's where input will go")
-    return render(request, 'lib/input.html')
-# def books(request):
-#     all_books = [book.title for book in Book.objects.all() ]
-#     context = {
-#         'all_book_list':all_books,
-#     }
-#     return render(request, 'lib/index.html', context)
+    if 'book' in request.POST:
+        new_book_title = request.POST['book']
+        context = {'added_book':new_book_title}
+        grj = book_google_lookup(new_book_title)
+        top_matches = grj['items'][0:5]
+        context = {'matches':top_matches}
+        # b = Book(title=new_book_title)
+        # b.save()
+    else:
+        context = {'matches':None}
+
+    return render(request, 'lib/input.html',context)
+
 
 class BooksView(generic.ListView):
     template_name = 'lib/index.html'

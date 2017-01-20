@@ -7,3 +7,14 @@
 <input type="text" name="book" id="book" value="" />
 <input type="submit" value="Submit" />
 </form>
+
+{% if matches %}
+<table>
+  {%for match in matches %}
+  <tr>
+  <td><a href="{% url 'lib:addbook' match.volumeInfo.industryIdentifiers.0.identifier  %}"><img src="{{match.volumeInfo.imageLinks.smallThumbnail}}" alt="Cover" style="width:100px;"></a></td>
+  <td>{{match.volumeInfo.title}}, {{match.volumeInfo.authors.0}}, {{match.volumeInfo.publishedDate}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}

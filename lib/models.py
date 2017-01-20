@@ -20,7 +20,7 @@ class Book(models.Model):
     title = models.CharField(max_length=200, null=True)
     isbn = models.IntegerField(default=-1)
     author = models.CharField(max_length=200,null=True)
-    
+
 
     def __str__(self):
         if not self.title: return 'No title'

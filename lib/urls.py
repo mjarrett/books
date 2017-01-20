@@ -7,6 +7,7 @@ app_name = 'lib'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^input/$', views.input, name='input'),
+    url(r'^addbook/(?P<isbn>\w+)/$',views.addbook,name='addbook'),
     url(r'^books/$', views.BooksView.as_view(), name='books'),
     url(r'^book/(?P<pk>[0-9]+)/$', views.BookView.as_view(), name='book'),
     ]
