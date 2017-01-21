@@ -7,11 +7,22 @@
 
 
 <h1>{{ book.title }}</h1>
+<table>
+<tr>
+  <td> Author:</td> <td>{{book.author}} </td>
+</tr>
+<tr>
+  <td> Category: </td><td>{% for cat in book.category_set.all %} {{ cat }} {% endfor %}</td>
+</tr>
+<tr>
+  <td> ISBN: </td><td>{{book.isbn }}</td>
+</tr>
+<tr>
+  <td> Location: </td><td>{{book.location}} </td>
+</tr>
+<tr>
+  <td> Owner: </td><td>{{book.owner}} </td>
+</tr>
+</table>
 
-<ul>
-  <li> Author: {{book.author}} </li>
-  <li> ISBN: {{book.isbn }}</li>
-  <li> Location: {{book.location}} </li>
-  <li> Owner: {{book.owner}} </li>
-</ul>
  {% endblock %}

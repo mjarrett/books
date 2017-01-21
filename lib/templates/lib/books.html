@@ -11,7 +11,7 @@
   <table>
     {% for book in object_list %}
   <tr>
-    <td>{{book.title}}</td> <td>{% for cat in book.category_set.all%}{{cat}} {% endfor %}</td> <td>{{book.owner}}</td>
+    <td><a href="{% url 'lib:book' book.id %}">{{book.title}} {{book.id}}</a></td> <td>{% for cat in book.category_set.all%}{{cat}} {% endfor %}</td> <td>{{book.owner}}</td>
   </tr>
     {% endfor %}
   </table>

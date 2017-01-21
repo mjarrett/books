@@ -29,6 +29,8 @@ def create_new_user():
 def index(request):
     return HttpResponse("Here's where the main page of the family library will be")
 
+
+
 @login_required
 def addbook(request,isbn):
     username = request.user.username
@@ -64,6 +66,11 @@ def input(request,book_added=False):
     else:
         context = {'matches':None}
     return render(request, 'lib/input.html',context)
+
+# @login_required
+# def catview(request,pk):
+#     c = Category.objects.get(id=pk)
+#     books = c.books_set.all()
 
 #View classes
 class BooksView(LoginRequiredMixin,generic.ListView):
