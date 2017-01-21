@@ -1,3 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}{{book.title}}{% endblock %}
+
+{% block content %}
+
+
+
 <h1>{{ book.title }}</h1>
 
 <ul>
@@ -6,3 +14,4 @@
   <li> Location: {{book.location}} </li>
   <li> Owner: {{book.owner}} </li>
 </ul>
+ {% endblock %}

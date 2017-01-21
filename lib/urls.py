@@ -1,6 +1,8 @@
 from django.conf.urls import url
+from django.contrib.auth import views as auth_views
 
 from . import views
+
 
 app_name = 'lib'
 
@@ -10,4 +12,7 @@ urlpatterns = [
     url(r'^addbook/(?P<isbn>\w+)/$',views.addbook,name='addbook'),
     url(r'^books/$', views.BooksView.as_view(), name='books'),
     url(r'^book/(?P<pk>[0-9]+)/$', views.BookView.as_view(), name='book'),
+    url(r'^login/$', auth_views.login, {'template_name': 'lib/login.html'}, name='login'),
+    url(r'^logout/$', auth_views.logout, {'template_name': 'lib/logged_out.html'}, name='logout'),
+
     ]

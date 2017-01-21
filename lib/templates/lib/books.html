@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Library{% endblock %}
+
+{% block content %}
+
+
+
+{% if object_list %}
+<h1>Books</h1>
+  <table>
+    {% for book in object_list %}
+  <tr>
+    <td>{{book.title}}</td> <td>{% for cat in book.category_set.all%}{{cat}} {% endfor %}</td> <td>{{book.owner}}</td>
+  </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  <p>No books available</p>
+{% endif %}
+
+{% endblock %}

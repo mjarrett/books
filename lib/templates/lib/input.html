@@ -1,20 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Add a new book{% endblock %}
+
+{% block content %}
+
+
+
 <h1>Input new book</h1>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+<p>Enter the title, author, and/or isbn of the book you'd like to add</p>
 <form action="{% url 'lib:input' %}" method="post">
-{% csrf_token %}
+{% csrf_token %} <! This is a security measure that should be added to all POST forms>
 <input type="text" name="book" id="book" value="" />
 <input type="submit" value="Submit" />
 </form>
 
+{% if added %}
+<p>Book successfully added to library</p>
+{% endif %}
+
 {% if matches %}
+<p>If you don't see the book you're looking for here, try searching again with different search terms</p>
 <table>
   {%for match in matches %}
   <tr>
-  <td><a href="{% url 'lib:addbook' match.volumeInfo.industryIdentifiers.0.identifier  %}"><img src="{{match.volumeInfo.imageLinks.smallThumbnail}}" alt="Cover" style="width:100px;"></a></td>
+  {% for id in match.volumeInfo.industryIdentifiers %}
+  {% if id.type == "ISBN_13" %}
+  <td><a href="{% url 'lib:addbook' id.identifier  %}"><img src="{{match.volumeInfo.imageLinks.smallThumbnail}}" alt="Cover" style="width:100px;"></a></td>
   <td>{{match.volumeInfo.title}}, {{match.volumeInfo.authors.0}}, {{match.volumeInfo.publishedDate}}</td>
+  {% endif %}
+  {% endfor %}
   </tr>
   {% endfor %}
 </table>
 {% endif %}
+
+{% endblock %}

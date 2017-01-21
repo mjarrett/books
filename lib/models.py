@@ -11,6 +11,9 @@ from django.db import models
 #     user = models.CharField(max_length=50)
 #     home = models.ForeignKey(Location, on_delete=models.CASCADE)
 
+
+
+
 class Book(models.Model):
 
     # owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -21,12 +24,16 @@ class Book(models.Model):
     isbn = models.IntegerField(default=-1)
     author = models.CharField(max_length=200,null=True)
 
-
     def __str__(self):
         if not self.title: return 'No title'
         else: return self.title
 
+class Category(models.Model):
+    category = models.CharField(max_length=200, unique=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.category
 # class Choice(models.Model):
 #     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 #     choice_text = models.CharField(max_length=200)

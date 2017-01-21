@@ -1,0 +1,10 @@
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    Logged in as: {{ user }} (<a href={% url 'lib:logout' %}>Logout</a>) | <a href= {% url 'lib:books' %}>Books</a> | <a href= {% url 'lib:input' %}>Add Book</a>
+
+    {% block content %}{% endblock %}
+</body>
+</html>
