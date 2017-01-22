@@ -25,6 +25,12 @@ def create_new_user():
     group = Group.objects.get(name='hoy')
     user.groups.add(group)
 
+    #Get a handle on a location
+    #loc=...
+    #connect user to location
+    #user.location_set.add(loc)
+
+
 # View functions
 def index(request):
     return HttpResponse("Here's where the main page of the family library will be")
@@ -33,6 +39,7 @@ def index(request):
 
 @login_required
 def addbook(request,isbn):
+    user = request.user
     username = request.user.username
     grj = book_google_lookup('isbn:'+ isbn)
     b = Book(owner=username,isbn=isbn,
@@ -40,6 +47,10 @@ def addbook(request,isbn):
             title=grj['items'][0]['volumeInfo']['title'],
             )
     b.save()
+
+    loc = user.location_set.get()
+    loc.book_set.add(b)
+
     categories = grj['items'][0]['volumeInfo']['categories']
     for cat in categories:
         cat = cat.title() #ensure categories are in Title Case
@@ -50,7 +61,7 @@ def addbook(request,isbn):
             #c = Category(category=cat)
             b.category_set.create(category=cat)
 
-         #add category to book
+
     return input(request,book_added=True)
 
 @login_required
