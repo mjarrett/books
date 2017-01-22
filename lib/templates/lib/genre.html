@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}{{book.title}}{% endblock %}
+{% block title %}{{category.category}}{% endblock %}
 
 {% block content %}
 
 <h1>{{category.category}}</h1>
+
+<table>
+  {% for book in category.book.all %}
+<tr>
+  <td><a href="{% url 'lib:book' book.id %}">{{book.title}}</a></td><td>{{book.owner}}</td>
+</tr>
+  {% endfor %}
+</table>
 
 {% endblock %}

@@ -67,10 +67,7 @@ def input(request,book_added=False):
         context = {'matches':None}
     return render(request, 'lib/input.html',context)
 
-# @login_required
-# def catview(request,pk):
-#     c = Category.objects.get(id=pk)
-#     books = c.books_set.all()
+
 
 #View classes
 class BooksView(LoginRequiredMixin,generic.ListView):
@@ -81,3 +78,11 @@ class BooksView(LoginRequiredMixin,generic.ListView):
 class BookView(LoginRequiredMixin,generic.DetailView):
     model = Book
     template_name = 'lib/book.html'
+
+class CatView(LoginRequiredMixin,generic.DetailView):
+    model = Category
+    template_name = 'lib/genre.html'
+
+class CatsView(LoginRequiredMixin,generic.ListView):
+    model = Category
+    template_name = 'lib/genres.html'

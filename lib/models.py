@@ -30,7 +30,7 @@ class Book(models.Model):
 
 class Category(models.Model):
     category = models.CharField(max_length=200, unique=True)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    book = models.ManyToManyField(Book)
 
     def __str__(self):
         return self.category

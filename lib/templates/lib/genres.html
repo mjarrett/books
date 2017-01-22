@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Genres{% endblock %}
+
+{% block content %}
+
+
+
+{% if object_list %}
+<h1>Genres</h1>
+  <table>
+    {% for cat in object_list %}
+  <tr>
+    <td><a href="{% url 'lib:genre' cat.id %}">{{cat.category}}</a></td>
+    <td>({{cat.book.all.count}})</td>
+  </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  <p>No books available</p>
+{% endif %}
+
+{% endblock %}
