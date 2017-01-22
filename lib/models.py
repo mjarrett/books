@@ -1,25 +1,21 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
-# class Location(models.Model):
-#     location = models.CharField(max_length=200)
-#
-# class User(models.Model):
-#     user = models.CharField(max_length=50)
-#     home = models.ForeignKey(Location, on_delete=models.CASCADE)
+class Location(models.Model):
+    location = models.CharField(max_length=200, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-
-
+    def __str__(self):
+        return self.location
 
 class Book(models.Model):
 
-    # owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    # location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
     owner = models.CharField(max_length=20, null=True)
-    location = models.CharField(max_length=50, null=True)
     title = models.CharField(max_length=200, null=True)
     isbn = models.IntegerField(default=-1)
     author = models.CharField(max_length=200,null=True)

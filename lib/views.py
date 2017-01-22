@@ -4,7 +4,7 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from lib.models import Book, Category
 
 import requests
@@ -21,7 +21,7 @@ def book_google_lookup(query):
 
 
 def create_new_user():
-    user = User.objects.create_user(username='tim',email='tim@hoy.ca',password='tim', first_name='Tim',last_name='Hoy')
+    user = User.objects.create_user(username='mike',email='msjarrett@gmail.com',password='nitro666', first_name='Mike',last_name='Jarrett')
     group = Group.objects.get(name='hoy')
     user.groups.add(group)
 
