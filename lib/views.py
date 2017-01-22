@@ -39,14 +39,15 @@ def index(request):
 
 @login_required
 def addbook(request,isbn):
-    user = request.user
-    username = request.user.username
     grj = book_google_lookup('isbn:'+ isbn)
-    b = Book(owner=username,isbn=isbn,
+    b = Book(isbn=isbn,
             author=grj['items'][0]['volumeInfo']['authors'][0],
             title=grj['items'][0]['volumeInfo']['title'],
             )
     b.save()
+
+    user = request.user
+    user.book_set.add(b)
 
     loc = user.location_set.get()
     loc.book_set.add(b)

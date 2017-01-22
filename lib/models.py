@@ -15,7 +15,7 @@ class Location(models.Model):
 class Book(models.Model):
 
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
-    owner = models.CharField(max_length=20, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=200, null=True)
     isbn = models.IntegerField(default=-1)
     author = models.CharField(max_length=200,null=True)

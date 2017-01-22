@@ -15,7 +15,7 @@
     <td>{% for cat in book.category_set.all%}
       <a href="{% url 'lib:genre' cat.id %}">{{cat}} </a>
       {% endfor %}</td>
-    <td>{{book.owner}}</td>
+    <td>{{book.owner.username}}
     <td>{{book.location}}</td>
   </tr>
     {% endfor %}
