@@ -43,6 +43,9 @@ def addbook(request,isbn):
     b = Book(isbn=isbn,
             author=grj['items'][0]['volumeInfo']['authors'][0],
             title=grj['items'][0]['volumeInfo']['title'],
+            thumbnail=grj['items'][0]['volumeInfo']['imageLinks']['thumbnail'],
+            description=grj['items'][0]['volumeInfo']['description'],
+            preview=grj['items'][0]['volumeInfo']['previewLink'],
             )
     b.save()
 

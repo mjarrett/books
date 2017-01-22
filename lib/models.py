@@ -19,6 +19,9 @@ class Book(models.Model):
     title = models.CharField(max_length=200, null=True)
     isbn = models.IntegerField(default=-1)
     author = models.CharField(max_length=200,null=True)
+    thumbnail = models.URLField(max_length=500,null=True)
+    description = models.CharField(max_length=3000,null=True)
+    preview = models.CharField(max_length=200,null=True)
 
     def __str__(self):
         if not self.title: return 'No title'

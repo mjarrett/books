@@ -7,6 +7,7 @@
 
 
 <h1>{{ book.title }}</h1>
+<img src="{{book.thumbnail}}" alt="Cover" style="width:300px;">
 <table>
 <tr>
   <td> Author:</td> <td>{{book.author}} </td>
@@ -24,5 +25,8 @@
   <td> Owner: </td><td>{{book.owner.username}} </td>
 </tr>
 </table>
+
+<p>{{book.description}}</p>
+<a href="{{book.preview}}">Google Books Preview</a>
 
  {% endblock %}
