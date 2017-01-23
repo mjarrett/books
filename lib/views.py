@@ -19,8 +19,8 @@ def book_google_lookup(query):
     gr = google_response.text
     return json.loads(gr)
 
-def is_group_match(book, user):
-    return any(x in book.owner.groups.all() for x in user.groups.all())
+def is_group_match(user1, user2):
+    return any(x in user1.groups.all() for x in user2.groups.all())
 
 
 def create_new_user():
@@ -68,11 +68,10 @@ def addbook(request,isbn):
             #c = Category(category=cat)
             b.category_set.create(category=cat)
 
-
-    return input(request,book_added=True)
+    return inputview(request,book_added=True)
 
 @login_required
-def input(request,book_added=False):
+def inputview(request,book_added=False):
     if book_added:
         context = {'added':True}
     elif 'book' in request.POST:
@@ -89,14 +88,14 @@ def input(request,book_added=False):
 def booksview(request):
     object_list = Book.objects.all()
     #only return books if user in matching group
-    object_list = [ b for b in object_list if is_group_match(b,request.user) ]
+    object_list = [ b for b in object_list if is_group_match(b.owner,request.user) ]
     context = {'object_list':object_list}
     return render(request, 'lib/books.html', context)
 
 @login_required
 def bookview(request,pk):
     book = Book.objects.get(id=pk)
-    if is_group_match(book,request.user):
+    if is_group_match(book.owner,request.user):
         context = {'book':book}
     else:
         context = {}
@@ -106,17 +105,32 @@ def bookview(request,pk):
 def catview(request,pk):
     cat = Category.objects.get(id=pk)
     book_list = cat.book.all()
-    book_list = [ b for b in book_list if is_group_match(b,request.user)]
+    book_list = [ b for b in book_list if is_group_match(b.owner,request.user)]
     context = {'book_list':book_list,'category':cat}
     return render(request, 'lib/genre.html', context)
 
 @login_required
 def catsview(request):
     object_list = Category.objects.all()
-    object_list = [ (cat,len([ b for b in cat.book.all() if is_group_match(b,request.user)])) for cat in object_list ]
+    object_list = [ (cat,len([ b for b in cat.book.all() if is_group_match(b.owner,request.user)])) for cat in object_list ]
     object_list = [ ob for ob in object_list if ob[1]>0]
     context = {'object_list':object_list}
     return render(request, 'lib/genres.html',context)
+
+@login_required
+def profile(request,username):
+    if is_group_match(request.user,User.objects.get(username=username)):
+        object_list = [ b for b in Book.objects.all() if b.owner.username == username]
+        context = {'object_list':object_list,'user':username}
+        return render(request, 'lib/profile.html', context)
+    else:
+        return HttpResponse("You do not have permission to view this page")
+
+@login_required
+def deletebook(request,pk):
+    Book.objects.filter(id=pk).delete()
+    return profile(request,request.user.username)
+
 #View classes
 # class BooksView(LoginRequiredMixin,generic.ListView):
 #     model = Book
@@ -126,11 +140,3 @@ def catsview(request):
 # class BookView(LoginRequiredMixin,generic.DetailView):
 #     model = Book
 #     template_name = 'lib/book.html'
-
-class CatView(LoginRequiredMixin,generic.DetailView):
-    model = Category
-    template_name = 'lib/genre.html'
-
-class CatsView(LoginRequiredMixin,generic.ListView):
-    model = Category
-    template_name = 'lib/genres.html'
