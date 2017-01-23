@@ -1,11 +1,5 @@
-{% extends "base.html" %}
-
-{% block title %}You are logged out{% endblock %}
-
-{% block content %}
-
-
-
-Logged out!
-
-{% endblock %}
+<html>
+<head>
+<meta http-equiv="refresh" content="0; url={% url 'lib:index' %}" />
+</head>
+</html>

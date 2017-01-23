@@ -6,3 +6,16 @@ a:link, a:visited {
 a:hover {
   text-decoration: underline;
 }
+
+
+
+body {
+    padding: 25px;
+    padding-top: 40px;
+    font-family: "Helvetica Neue" sans-serif;
+}
+
+table td {
+    margin: 0px 20px;
+    padding: 0px 20px;
+}
