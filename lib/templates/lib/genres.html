@@ -11,8 +11,8 @@
   <table>
     {% for cat in object_list %}
   <tr>
-    <td><a href="{% url 'lib:genre' cat.id %}">{{cat.category}}</a></td>
-    <td>({{cat.book.all.count}})</td>
+    <td><a href="{% url 'lib:genre' cat.0.id %}">{{cat.0.category}}</a></td>
+    <td>({{cat.1}})</td>
   </tr>
     {% endfor %}
   </table>

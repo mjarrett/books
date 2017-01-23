@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}{{book.title}}{% endblock %}
+
 
 {% block content %}
 
-
-
+{% if book %}
 <h1>{{ book.title }}</h1>
 <img src="{{book.thumbnail}}" alt="Cover" style="width:300px;">
 <table>
@@ -28,5 +27,8 @@
 
 <p>{{book.description}}</p>
 <a href="{{book.preview}}">Google Books Preview</a>
+{% else %}
+<p>You do not have permission to view this book</p>
+{% endif %}
 
- {% endblock %}
+{% endblock %}

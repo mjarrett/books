@@ -19,6 +19,9 @@ def book_google_lookup(query):
     gr = google_response.text
     return json.loads(gr)
 
+def is_group_match(book, user):
+    return any(x in book.owner.groups.all() for x in user.groups.all())
+
 
 def create_new_user():
     user = User.objects.create_user(username='mike',email='msjarrett@gmail.com',password='nitro666', first_name='Mike',last_name='Jarrett')
@@ -82,17 +85,47 @@ def input(request,book_added=False):
         context = {'matches':None}
     return render(request, 'lib/input.html',context)
 
+@login_required
+def booksview(request):
+    object_list = Book.objects.all()
+    #only return books if user in matching group
+    object_list = [ b for b in object_list if is_group_match(b,request.user) ]
+    context = {'object_list':object_list}
+    return render(request, 'lib/books.html', context)
 
+@login_required
+def bookview(request,pk):
+    book = Book.objects.get(id=pk)
+    if is_group_match(book,request.user):
+        context = {'book':book}
+    else:
+        context = {}
+    return render(request, 'lib/book.html', context)
 
+@login_required
+def catview(request,pk):
+    cat = Category.objects.get(id=pk)
+    book_list = cat.book.all()
+    book_list = [ b for b in book_list if is_group_match(b,request.user)]
+    context = {'book_list':book_list,'category':cat}
+    return render(request, 'lib/genre.html', context)
+
+@login_required
+def catsview(request):
+    object_list = Category.objects.all()
+    object_list = [ (cat,len([ b for b in cat.book.all() if is_group_match(b,request.user)])) for cat in object_list ]
+    object_list = [ ob for ob in object_list if ob[1]>0]
+    context = {'object_list':object_list}
+    return render(request, 'lib/genres.html',context)
 #View classes
-class BooksView(LoginRequiredMixin,generic.ListView):
-    model = Book
-    template_name = 'lib/books.html'
+# class BooksView(LoginRequiredMixin,generic.ListView):
+#     model = Book
+#     template_name = 'lib/books.html'
 
-
-class BookView(LoginRequiredMixin,generic.DetailView):
-    model = Book
-    template_name = 'lib/book.html'
+#
+# class BookView(LoginRequiredMixin,generic.DetailView):
+#     model = Book
+#     template_name = 'lib/book.html'
 
 class CatView(LoginRequiredMixin,generic.DetailView):
     model = Category

@@ -5,11 +5,11 @@
 {% block content %}
 
 
-
 {% if object_list %}
 <h1>Books</h1>
   <table>
     {% for book in object_list %}
+
   <tr>
     <td><a href="{% url 'lib:book' book.id %}">{{book.title}}</a></td>
     <td>{% for cat in book.category_set.all%}

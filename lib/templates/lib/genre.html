@@ -7,9 +7,9 @@
 <h1>{{category.category}}</h1>
 
 <table>
-  {% for book in category.book.all %}
+  {% for book in book_list %}
 <tr>
-  <td><a href="{% url 'lib:book' book.id %}">{{book.title}}</a></td><td>{{book.owner}}</td>
+  <td><a href="{% url 'lib:book' book.id %}">{{book.title}}</a></td><td>{{book.owner.username}}</td>
 </tr>
   {% endfor %}
 </table>
