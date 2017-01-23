@@ -39,6 +39,20 @@ def index(request):
     return HttpResponse("Here's where the main page of the family library will be")
 
 
+@login_required
+def inputview(request,book_added=False):
+    if book_added:
+        context = {'added':True}
+    elif 'book' in request.POST:
+        new_book_title = request.POST['book']
+        context = {'added_book':new_book_title}
+        grj = book_google_lookup(new_book_title)
+        top_matches = grj['items'][0:15]
+        context = {'matches':top_matches}
+    else:
+        context = {'matches':None}
+    return render(request, 'lib/input.html',context)
+
 
 @login_required
 def addbook(request,isbn):
@@ -54,9 +68,15 @@ def addbook(request,isbn):
 
     user = request.user
     user.book_set.add(b)
+    print(user)
+    try:
+        loc = user.location_set.get()
+        loc.book_set.add(b)
+    except:
+        print("This user doesn't have a location")
 
-    loc = user.location_set.get()
-    loc.book_set.add(b)
+
+
 
     categories = grj['items'][0]['volumeInfo']['categories']
     for cat in categories:
@@ -70,19 +90,7 @@ def addbook(request,isbn):
 
     return inputview(request,book_added=True)
 
-@login_required
-def inputview(request,book_added=False):
-    if book_added:
-        context = {'added':True}
-    elif 'book' in request.POST:
-        new_book_title = request.POST['book']
-        context = {'added_book':new_book_title}
-        grj = book_google_lookup(new_book_title)
-        top_matches = grj['items'][0:15]
-        context = {'matches':top_matches}
-    else:
-        context = {'matches':None}
-    return render(request, 'lib/input.html',context)
+
 
 @login_required
 def booksview(request):
