@@ -6,7 +6,7 @@
 
 
 {% if object_list %}
-<h1>{{user.title}}'s Books</h1>
+<h1>{{profileuser.title}}'s Books</h1>
   <table>
     {% for book in object_list %}
 
@@ -15,7 +15,9 @@
     <td>{% for cat in book.category_set.all%}
       <a href="{% url 'lib:genre' cat.id %}">{{cat}} </a>
       {% endfor %}</td>
+    {% if user.username == profileuser %}
     <td><a href="{% url 'lib:delete' book.id %}">Remove</a></td>
+    {% endif %}
   </tr>
     {% endfor %}
   </table>

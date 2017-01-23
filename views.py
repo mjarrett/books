@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.contrib.auth.models import User, Group
-from lib.models import Book, Category
+from lib.models import Book, Category, Location
 
 import requests
 import json
@@ -32,6 +32,9 @@ def create_new_user():
     #loc=...
     #connect user to location
     #user.location_set.add(loc)
+
+    #For new location,
+    #Location(location='...',user=user)
 
 
 # View functions
@@ -129,7 +132,7 @@ def catsview(request):
 def profile(request,username):
     if is_group_match(request.user,User.objects.get(username=username)):
         object_list = [ b for b in Book.objects.all() if b.owner.username == username]
-        context = {'object_list':object_list,'user':username}
+        context = {'object_list':object_list,'profileuser':username}
         return render(request, 'lib/profile.html', context)
     else:
         return HttpResponse("You do not have permission to view this page")
