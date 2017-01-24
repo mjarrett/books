@@ -11,11 +11,11 @@
 
 <h1>{{profileuser.title}}'s Books</h1>
   <table>
-    {% for book in object_list %}
+    {% for book in object_list|dictsort:'title' %}
 
   <tr>
     <td><a href="{% url 'lib:book' book.id %}">{{book.title}}</a></td>
-    <td>{% for cat in book.category_set.all%}
+    <td>{% for cat in book.category_set.all %}
       <a href="{% url 'lib:genre' cat.id %}">{{cat}} </a>
       {% endfor %}</td>
     {% if user.username == profileuser %}
