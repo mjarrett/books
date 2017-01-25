@@ -130,6 +130,7 @@ def catsview(request):
 
 @login_required
 def profile(request,username):
+    print(request.user.groups.all(), User.objects.get(username=username).groups.all())
     if is_group_match(request.user,User.objects.get(username=username)):
         object_list = [ b for b in Book.objects.all() if b.owner.username == username]
         context = { 'object_list': object_list, 'profileuser':username}
@@ -148,6 +149,9 @@ def signup(request):
         if 'newusersub' in request.POST:
             form = UserForm(request.POST)
             user = User.objects.create_user(username=request.POST['username'],email=request.POST['email'],password=request.POST['password'], first_name=request.POST['first_name'],last_name=request.POST['last_name'])
+            selfgroup = Group(name=request.POST['username'])
+            selfgroup.save()
+            selfgroup.user_set.add(user)
             user = authenticate(username=request.POST['username'], password=request.POST['password'])
             if user is not None:
                 login(request, user)
@@ -161,12 +165,23 @@ def signup(request):
 
 @login_required
 def joingroup(request):
-    if request.method == 'POST':
+    if request.method == 'POST' and  'groupcode' in request.POST:
         if request.POST['groupcode'] in group_codes.group_codes:
-            group = group_codes.group_codes[request.POST['groupcode']]
+            groupname = group_codes.group_codes[request.POST['groupcode']]
 
-            context = {'success':group}
+            try:
+                group = Group.objects.get(name=groupname)
+            except:
+                group = Group(name=groupname)
+                group.save()
+
+            group.user_set.add(request.user)
+
+
+            context = {'success':groupname}
             return render(request, 'lib/joingroup.html',context)
+
+
     context = {'form':GroupForm()}
     return render(request, 'lib/joingroup.html',context)
 
