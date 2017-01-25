@@ -155,16 +155,18 @@ def signup(request):
             else:
                 print('login failed')
                 return signup(request)
-        elif 'groupsub' in request.POST:
-            if request.POST['groupcode'] in group_codes.group_codes:
 
-                context = {'success':group_codes.group_codes[request.POST['groupcode']]}
-                return render(request, 'lib/joingroup.html',context)
     context = {'form':UserForm()}
     return render(request, 'lib/signup.html',context)
 
 @login_required
 def joingroup(request):
+    if request.method == 'POST':
+        if request.POST['groupcode'] in group_codes.group_codes:
+            group = group_codes.group_codes[request.POST['groupcode']]
+
+            context = {'success':group}
+            return render(request, 'lib/joingroup.html',context)
     context = {'form':GroupForm()}
     return render(request, 'lib/joingroup.html',context)
 
