@@ -147,14 +147,14 @@ def signup(request):
     if request.method == 'POST':
         if 'newusersub' in request.POST:
             form = UserForm(request.POST)
-            context = {'form':GroupForm()}
             user = User.objects.create_user(username=request.POST['username'],email=request.POST['email'],password=request.POST['password'], first_name=request.POST['first_name'],last_name=request.POST['last_name'])
             user = authenticate(username=request.POST['username'], password=request.POST['password'])
             if user is not None:
                 login(request, user)
+                return joingroup(request)
             else:
                 print('login failed')
-            return render(request, 'lib/joingroup.html',context)
+                return signup(request)
         elif 'groupsub' in request.POST:
             if request.POST['groupcode'] in group_codes.group_codes:
 
@@ -162,6 +162,11 @@ def signup(request):
                 return render(request, 'lib/joingroup.html',context)
     context = {'form':UserForm()}
     return render(request, 'lib/signup.html',context)
+
+@login_required
+def joingroup(request):
+    context = {'form':GroupForm()}
+    return render(request, 'lib/joingroup.html',context)
 
 
 #View classes

@@ -1,8 +1,10 @@
-{% extends "base.html" %}
+{% extends "lib/base.html" %}
 
 
 
 {% block content %}
+
+{% include "lib/header.html" %}
 
 {% if book %}
 <h1>{{ book.title }}</h1>

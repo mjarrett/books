@@ -1,9 +1,10 @@
-{% extends "base.html" %}
+{% extends "lib/base.html" %}
 
 {% block title %}Library{% endblock %}
 
 {% block content %}
 
+{% include "lib/header.html" %}
 
 {% if object_list %}
 <h1>Books</h1>
