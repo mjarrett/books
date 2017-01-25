@@ -3,10 +3,13 @@ from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import authenticate, login
+
 
 from django.contrib.auth.models import User, Group
-from lib.models import Book, Category, Location
+from lib.models import Book, Category, Location, UserForm, GroupForm
 
+import group_codes
 import requests
 import json
 
@@ -78,9 +81,6 @@ def addbook(request,isbn):
     except:
         print("This user doesn't have a location")
 
-
-
-
     categories = grj['items'][0]['volumeInfo']['categories']
     for cat in categories:
         cat = cat.title() #ensure categories are in Title Case
@@ -133,7 +133,7 @@ def profile(request,username):
     if is_group_match(request.user,User.objects.get(username=username)):
         object_list = [ b for b in Book.objects.all() if b.owner.username == username]
         context = { 'object_list': object_list, 'profileuser':username}
-        
+
         return render(request, 'lib/profile.html', context)
     else:
         return HttpResponse("You do not have permission to view this page")
@@ -142,6 +142,27 @@ def profile(request,username):
 def deletebook(request,pk):
     Book.objects.filter(id=pk).delete()
     return profile(request,request.user.username)
+
+def signup(request):
+    if request.method == 'POST':
+        if 'newusersub' in request.POST:
+            form = UserForm(request.POST)
+            context = {'form':GroupForm()}
+            user = User.objects.create_user(username=request.POST['username'],email=request.POST['email'],password=request.POST['password'], first_name=request.POST['first_name'],last_name=request.POST['last_name'])
+            user = authenticate(username=request.POST['username'], password=request.POST['password'])
+            if user is not None:
+                login(request, user)
+            else:
+                print('login failed')
+            return render(request, 'lib/joingroup.html',context)
+        elif 'groupsub' in request.POST:
+            if request.POST['groupcode'] in group_codes.group_codes:
+
+                context = {'success':group_codes.group_codes[request.POST['groupcode']]}
+                return render(request, 'lib/joingroup.html',context)
+    context = {'form':UserForm()}
+    return render(request, 'lib/signup.html',context)
+
 
 #View classes
 # class BooksView(LoginRequiredMixin,generic.ListView):

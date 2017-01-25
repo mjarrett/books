@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.forms import Form, ModelForm, CharField
 # Create your models here.
 
 class Location(models.Model):
@@ -33,6 +33,18 @@ class Category(models.Model):
 
     def __str__(self):
         return self.category
+
+
+# Model Forms
+class UserForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['username','first_name','last_name','password','email']
+        help_texts = {'username': None}
+
+class GroupForm(Form):
+    groupcode = CharField(label='Group Code',max_length=100)
+
 # class Choice(models.Model):
 #     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 #     choice_text = models.CharField(max_length=200)
