@@ -26,19 +26,6 @@ def is_group_match(user1, user2):
     return any(x in user1.groups.all() for x in user2.groups.all())
 
 
-def create_new_user():
-    user = User.objects.create_user(username='mike',email='msjarrett@gmail.com',password='nitro666', first_name='Mike',last_name='Jarrett')
-    group = Group.objects.get(name='hoy')
-    user.groups.add(group)
-
-    #Get a handle on a location
-    #loc=...
-    #connect user to location
-    #user.location_set.add(loc)
-
-    #For new location,
-    #Location(location='...',user=user)
-
 
 # View functions
 def index(request):
@@ -148,7 +135,12 @@ def signup(request):
     if request.method == 'POST':
         if 'newusersub' in request.POST:
             form = UserForm(request.POST)
-            user = User.objects.create_user(username=request.POST['username'],email=request.POST['email'],password=request.POST['password'], first_name=request.POST['first_name'],last_name=request.POST['last_name'])
+            if User.objects.filter(username=request.POST['username']).exists() or request.POST['username'] in group_codes.group_codes.values():
+                return render(request, 'lib/signup.html', {'form':UserForm(), 'error':"Sorry, your user name is alread being used. Please try again"})
+            try:
+                user = User.objects.create_user(username=request.POST['username'],email=request.POST['email'],password=request.POST['password'], first_name=request.POST['first_name'],last_name=request.POST['last_name'])
+            except:
+                return render(request, 'lib/signup.html', {'form':UserForm(), 'error':"Sorry, something didn't work. Please try again"})
             selfgroup = Group(name=request.POST['username'])
             selfgroup.save()
             selfgroup.user_set.add(user)
@@ -180,6 +172,8 @@ def joingroup(request):
 
             context = {'success':groupname}
             return render(request, 'lib/joingroup.html',context)
+        else:
+            return render(request, 'lib/joingroup.html',{'form':GroupForm(),'error':"Sorry, that's not a valid group code. Try again or add a group later"})
 
 
     context = {'form':GroupForm()}

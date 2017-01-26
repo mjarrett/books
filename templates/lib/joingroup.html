@@ -6,10 +6,15 @@
 
 <h1>New User</h1>
 
-{% if success %}
+{% if error %}
+<p>{{error}}</p>
+
+{% elif success %}
 <p> Congrats! You're signed up to the {{success}} group </p>
 
-{% elif form %}
+{% endif %}
+
+{% if form %}
 
 <form action="{% url 'lib:joingroup' %}" method="post">
 {% csrf_token %}
