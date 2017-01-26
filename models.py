@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import Form, ModelForm, CharField
+from django.forms import Form, ModelForm, CharField, PasswordInput
 # Create your models here.
 
 class Location(models.Model):
@@ -37,6 +37,8 @@ class Category(models.Model):
 
 # Model Forms
 class UserForm(ModelForm):
+    password = CharField(widget=PasswordInput())
+
     class Meta:
         model = User
         fields = ['username','first_name','last_name','password','email']
