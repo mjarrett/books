@@ -11,9 +11,10 @@
 <h1>Genres</h1>
   <table>
     {% for cat in object_list %}
-  <tr>
     <td><a href="{% url 'lib:genre' cat.0.id %}">{{cat.0.category}}</a></td>
     <td>({{cat.1}})</td>
+  <tr>
+
   </tr>
     {% endfor %}
   </table>

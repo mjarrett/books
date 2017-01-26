@@ -17,12 +17,14 @@ import json
 
 # Non-view helper functions
 def sort_by_attribute(object_list,att,rev):
-    print('hello')
-    print(rev)
     if rev=="True": rev=True
     elif rev=="False": rev=False
     if att == 'author':
-        return sorted(object_list, key=lambda x: getattr(x,att).split()[-1], reverse=rev)
+        return sorted(object_list, key=lambda x: x.author.split()[-1], reverse=rev)
+    elif att == 'owner':
+        return sorted(object_list, key=lambda x: x.owner.username, reverse=rev)
+    elif att == 'category':
+        return sorted(object_list, key=lambda x: list(x.category.all())[0].category, reverse=rev)
     else:
         return sorted(object_list, key=lambda x: getattr(x,att), reverse=rev)
 
@@ -71,7 +73,6 @@ def addbook(request,isbn):
 
     user = request.user
     user.book.add(b)
-    print(user)
     try:
         loc = user.location.get()
         loc.book.add(b)
@@ -102,7 +103,7 @@ def booksview(request):
         reverse = request.GET.get('reverse')
     else:
         att='id'
-        reverse = False
+        reverse = True
     context = {'object_list':sort_by_attribute(object_list,att,reverse)}
 
     return render(request, 'lib/books.html', context)
@@ -148,7 +149,7 @@ def catview(request,pk):
 def catsview(request):
     object_list = Category.objects.all()
     object_list = [ (cat,len([ b for b in cat.book.all() if is_group_match(b.owner,request.user)])) for cat in object_list ]
-    object_list = [ ob for ob in object_list if ob[1]>0]
+    object_list = sorted([ ob for ob in object_list if ob[1]>0], key=lambda x:x[1], reverse=True)
     context = {'object_list':object_list}
     return render(request, 'lib/genres.html',context)
 
@@ -156,10 +157,7 @@ def catsview(request):
 def profile(request,username):
     #print(request.user.groups.all(), User.objects.get(username=username).groups.all())
     if is_group_match(request.user,User.objects.get(username=username)):
-        print('test')
         object_list = [ b for b in Book.objects.all() if b.owner.username == username]
-        print(object_list)
-        #context = { 'object_list': object_list, 'profileuser':username}
 
         if request.method == 'GET' and  'att' in request.GET:
             att = request.GET.get('att')
@@ -175,8 +173,12 @@ def profile(request,username):
 
 @login_required
 def deletebook(request,pk):
-    Book.objects.filter(id=pk).delete()
-    return profile(request,request.user.username)
+    book = Book.objects.get(id=pk)
+    if book.owner.username == request.user.username:
+        book.delete()
+        return profile(request,request.user.username)
+    else:
+        return profile(request,request.user.username)
 
 def signup(request):
     if request.method == 'POST':

@@ -14,7 +14,7 @@
   <td> Author:</td> <td>{{book.author}} </td>
 </tr>
 <tr>
-  <td> Category: </td><td>{% for cat in book.category_set.all %} {{ cat }} {% endfor %}</td>
+  <td> Category: </td><td>{% for cat in book.category.all %} {{ cat }} {% endfor %}</td>
 </tr>
 <tr>
   <td> ISBN: </td><td>{{book.isbn }}</td>
