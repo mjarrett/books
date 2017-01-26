@@ -22,7 +22,11 @@ def sort_by_attribute(object_list,att,rev):
     if rev=="True": rev=True
     elif rev=="False": rev=False
     if att == 'author':
-        return sorted(object_list, key=lambda x: getattr(x,att).split()[-1], reverse=rev)
+        return sorted(object_list, key=lambda x: x.author.split()[-1], reverse=rev)
+    elif att == 'owner':
+        return sorted(object_list, key=lambda x: x.owner.username, reverse=rev)
+    elif att == 'category':
+        return sorted(object_list, key=lambda x: list(x.category.all())[0].category, reverse=rev)
     else:
         return sorted(object_list, key=lambda x: getattr(x,att), reverse=rev)
 
