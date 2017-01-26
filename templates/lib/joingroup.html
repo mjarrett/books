@@ -1,15 +1,22 @@
-
+{% extends "lib/base.html" %}
 
 {% block content %}
 
+{% include "lib/header.html" %}
+
 <h1>New User</h1>
 
-{% if success %}
+{% if error %}
+<p>{{error}}</p>
+
+{% elif success %}
 <p> Congrats! You're signed up to the {{success}} group </p>
 
-{% elif form %}
+{% endif %}
 
-<form action="{% url 'lib:signup' %}" method="post">
+{% if form %}
+
+<form action="{% url 'lib:joingroup' %}" method="post">
 {% csrf_token %}
 <table>
 <tr>

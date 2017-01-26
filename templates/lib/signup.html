@@ -1,8 +1,12 @@
-
+{% extends "lib/base.html" %}
 
 {% block content %}
 
 <h1>New User</h1>
+
+{% if error %}
+<p> {{error}} </p>
+{% endif %}
 
 <form action="{% url 'lib:signup' %}" method="post">
 {% csrf_token %}

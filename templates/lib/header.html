@@ -1,0 +1,8 @@
+
+
+<p>Logged in as: {{ request.user.username }} (<a href={% url 'lib:logout' %}>Logout</a>)
+  | <a href= {% url 'lib:books' %}>Books</a>
+  | <a href= {% url 'lib:genres' %}>Genres</a>
+  | <a href= {% url 'lib:input' %}>Add Book</a>
+  | <a href= {% url 'lib:profile' request.user.username %}>My books</a>
+</p>
