@@ -10,20 +10,29 @@
 {% if object_list %}
 
 <h1>{{profileuser.title}}'s Books</h1>
+
+
   <table>
-    {% for book in object_list|dictsort:'title' %}
+    <tr>
+      <th>Book <a href="{% url 'lib:profile' profileuser %}?att=title&reverse=False"> &#9650</a><a href="{% url 'lib:profile' profileuser %}?att=title&reverse=True">&#9660</a></th>
+      <th>Author <a href="{% url 'lib:profile' profileuser %}?att=author&reverse=False"> &#9650</a><a href="{% url 'lib:profile' profileuser %}?att=author&reverse=True">&#9660</a></th>
+      <th>Genre <a href="{% url 'lib:profile' profileuser %}?att=category&reverse=False"> &#9650</a><a href="{% url 'lib:profile' profileuser %}?att=category&reverse=True">&#9660</a></th>
+      <th>Owner <a href="{% url 'lib:profile' profileuser %}?att=owner&reverse=False"> &#9650</a><a href="{% url 'lib:profile' profileuser %}?att=owner&reverse=True">&#9660</a></th>
+    </tr>
+    {% for book in object_list %}
 
   <tr>
     <td><a href="{% url 'lib:book' book.id %}">{{book.title}}</a></td>
-    <td>{% for cat in book.category_set.all %}
+    <td>{{book.author}}</td>
+    <td>{% for cat in book.category.all%}
       <a href="{% url 'lib:genre' cat.id %}">{{cat}} </a>
       {% endfor %}</td>
-    {% if user.username == profileuser %}
-    <td><a href="{% url 'lib:delete' book.id %}">Remove</a></td>
-    {% endif %}
+    <td><a href="{% url 'lib:profile' book.owner %}">{{book.owner.username}}</a>
   </tr>
     {% endfor %}
   </table>
+
+
 {% else %}
   <p>No books available</p>
 {% endif %}

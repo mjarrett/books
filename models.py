@@ -2,20 +2,20 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import Form, ModelForm, CharField
+from django.forms import Form, ModelForm, CharField, PasswordInput
 # Create your models here.
 
 class Location(models.Model):
     location = models.CharField(max_length=200, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, related_name='location')
 
     def __str__(self):
         return self.location
 
 class Book(models.Model):
 
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, related_name='book')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='book')
     title = models.CharField(max_length=200, null=True)
     isbn = models.IntegerField(default=-1)
     author = models.CharField(max_length=200,null=True)
@@ -29,7 +29,7 @@ class Book(models.Model):
 
 class Category(models.Model):
     category = models.CharField(max_length=200, unique=True)
-    book = models.ManyToManyField(Book)
+    book = models.ManyToManyField(Book,related_name='category')
 
     def __str__(self):
         return self.category
@@ -37,6 +37,8 @@ class Category(models.Model):
 
 # Model Forms
 class UserForm(ModelForm):
+    password = CharField(widget=PasswordInput())
+
     class Meta:
         model = User
         fields = ['username','first_name','last_name','password','email']

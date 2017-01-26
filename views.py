@@ -16,6 +16,16 @@ import json
 #Login and logout views handled automatically from urls.py
 
 # Non-view helper functions
+def sort_by_attribute(object_list,att,rev):
+    print('hello')
+    print(rev)
+    if rev=="True": rev=True
+    elif rev=="False": rev=False
+    if att == 'author':
+        return sorted(object_list, key=lambda x: getattr(x,att).split()[-1], reverse=rev)
+    else:
+        return sorted(object_list, key=lambda x: getattr(x,att), reverse=rev)
+
 def book_google_lookup(query):
     url='https://www.googleapis.com/books/v1/volumes?q='+query
     google_response = requests.get(url)
@@ -87,7 +97,14 @@ def booksview(request):
     object_list = Book.objects.all()
     #only return books if user in matching group
     object_list = [ b for b in object_list if is_group_match(b.owner,request.user) ]
-    context = {'object_list':object_list}
+    if request.method == 'GET' and  'att' in request.GET:
+        att=request.GET.get('att')
+        reverse = request.GET.get('reverse')
+    else:
+        att='id'
+        reverse = False
+    context = {'object_list':sort_by_attribute(object_list,att,reverse)}
+
     return render(request, 'lib/books.html', context)
 
 @login_required
@@ -100,11 +117,31 @@ def bookview(request,pk):
     return render(request, 'lib/book.html', context)
 
 @login_required
+def authorview(request,authorname):
+    book_list = Book.objects.filter(author=authorname)
+    book_list = [ b for b in book_list if is_group_match(b.owner,request.user)]
+    context = {'book_list':book_list,'author':authorname}
+    return render(request, 'lib/author.html', context)
+
+@login_required
+def authorsview(request):
+    authors = sorted(set(b.author for b in Book.objects.all()),key=lambda x: x.split()[-1])
+    context = {'authors':authors}
+    return render(request, 'lib/authors.html', context)
+
+@login_required
 def catview(request,pk):
     cat = Category.objects.get(id=pk)
     book_list = cat.book.all()
     book_list = [ b for b in book_list if is_group_match(b.owner,request.user)]
-    context = {'book_list':book_list,'category':cat}
+    #context = {'book_list':book_list,'category':cat}
+    if request.method == 'GET' and  'att' in request.GET:
+        att = request.GET.get('att')
+        reverse = request.GET.get('reverse')
+    else:
+        att='id'
+        reverse = False
+    context = {'book_list':sort_by_attribute(book_list,att,reverse),'category':cat}
     return render(request, 'lib/genre.html', context)
 
 @login_required
@@ -120,7 +157,15 @@ def profile(request,username):
     print(request.user.groups.all(), User.objects.get(username=username).groups.all())
     if is_group_match(request.user,User.objects.get(username=username)):
         object_list = [ b for b in Book.objects.all() if b.owner.username == username]
-        context = { 'object_list': object_list, 'profileuser':username}
+        #context = { 'object_list': object_list, 'profileuser':username}
+
+        if request.method == 'GET' and  'att' in request.GET:
+            att = request.GET.get('att')
+            reverse = request.GET.get('reverse')
+        else:
+            att='id'
+            reverse = False
+        context = {'object_list':sort_by_attribute(object_list,att,reverse), 'profileuser':username}
 
         return render(request, 'lib/profile.html', context)
     else:
