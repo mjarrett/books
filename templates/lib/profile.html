@@ -9,7 +9,7 @@
 
 {% if object_list %}
 
-<h1>{{profileuser.title}}'s Books</h1>
+<h1>{{profileuser}}'s Books</h1>
 
 
   <table>
@@ -23,7 +23,7 @@
 
   <tr>
     <td><a href="{% url 'lib:book' book.id %}">{{book.title}}</a></td>
-    <td>{{book.author}}</td>
+    <td><a href="{% url 'lib:author' book.author %}">{{book.author}}</a></td>
     <td>{% for cat in book.category.all%}
       <a href="{% url 'lib:genre' cat.id %}">{{cat}} </a>
       {% endfor %}</td>
