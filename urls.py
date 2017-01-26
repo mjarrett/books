@@ -7,7 +7,8 @@ from . import views
 app_name = 'lib'
 
 urlpatterns = [
-    url(r'^$', auth_views.login, {'template_name': 'lib/login.html'}, name='login'),
+    #url(r'^$', auth_views.login, {'template_name': 'lib/login.html'}, name='login'),
+    url(r'^$', views.booksview, name='root'),
     url(r'^input/$', views.inputview, name='input'),
     url(r'^addbook/(?P<isbn>\w+)/$',views.addbook,name='addbook'),
     url(r'^books/$', views.booksview, name='books'),
