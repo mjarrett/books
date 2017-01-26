@@ -79,15 +79,16 @@ def addbook(request,isbn):
     except:
         print("This user doesn't have a location")
 
-    categories = grj['items'][0]['volumeInfo']['categories']
-    for cat in categories:
-        cat = cat.title() #ensure categories are in Title Case
-        try: #try to get a handle on a category if it exists
-            c = Category.objects.get(category=cat)
-            b.category.add(c)
-        except: # if it doesn't, make it
-            #c = Category(category=cat)
-            b.category.create(category=cat)
+    if 'categories' in grj['items'][0]['volumeInfo']:
+        categories = grj['items'][0]['volumeInfo']['categories']
+        for cat in categories:
+            cat = cat.title() #ensure categories are in Title Case
+            try: #try to get a handle on a category if it exists
+                c = Category.objects.get(category=cat)
+                b.category.add(c)
+            except: # if it doesn't, make it
+                #c = Category(category=cat)
+                b.category.create(category=cat)
 
     return inputview(request,book_added=True)
 
