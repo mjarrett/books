@@ -1,6 +1,7 @@
 {% extends "lib/base.html" %}
 
 
+
 {% block title %}Login to your library{% endblock %}
 
 {% block content %}
@@ -27,5 +28,7 @@
 <input type="submit" value="login" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
+
+<p><a href="{% url 'lib:signup' %}">Click here if you're not already a user!</a></p>
 
 {% endblock %}
