@@ -152,7 +152,7 @@ def catview(request,pk):
 def catsview(request):
     object_list = Category.objects.all()
     object_list = [ (cat,len([ b for b in cat.book.all() if is_group_match(b.owner,request.user)])) for cat in object_list ]
-    object_list = [ ob for ob in object_list if ob[1]>0]
+    object_list = sorted([ ob for ob in object_list if ob[1]>0], key=lambda x:x[1], reverse=True)
     context = {'object_list':object_list}
     return render(request, 'lib/genres.html',context)
 
