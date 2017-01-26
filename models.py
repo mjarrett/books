@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 from django.forms import Form, ModelForm, CharField, PasswordInput
+from django.utils import timezone
 # Create your models here.
 
 class Location(models.Model):
@@ -22,6 +23,7 @@ class Book(models.Model):
     thumbnail = models.URLField(max_length=500,null=True)
     description = models.CharField(max_length=3000,null=True)
     preview = models.CharField(max_length=200,null=True)
+    date_added = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         if not self.title: return 'No title'
