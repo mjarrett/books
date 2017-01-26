@@ -106,7 +106,7 @@ def booksview(request):
         reverse = request.GET.get('reverse')
     else:
         att='id'
-        reverse = False
+        reverse = True
     context = {'object_list':sort_by_attribute(object_list,att,reverse)}
 
     return render(request, 'lib/books.html', context)
