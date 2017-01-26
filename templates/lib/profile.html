@@ -25,10 +25,12 @@
     <td><a href="{% url 'lib:book' book.id %}">{{book.title}}</a></td>
     <td><a href="{% url 'lib:author' book.author %}">{{book.author}}</a></td>
     <td>{% for cat in book.category.all%}
-      <a href="{% url 'lib:genre' cat.id %}">{{cat}} </a>
+      <a href="{% url 'lib:genre' cat.id %}">{{cat}} </a></td>
       {% endfor %}</td>
-    <td><a href="{% url 'lib:profile' book.owner %}">{{book.owner.username}}</a>
-    <td><a href="{% url 'lib:delete' book.id %}" title="Delete this book from your library">  &#10060; </a>
+    <td><a href="{% url 'lib:profile' book.owner %}">{{book.owner.username}}</a></td>
+    {% if user.username == profileuser %}
+    <td><div title="Delete this book from your library"><a href="{% url 'lib:delete' book.id %}">  &#10060; </a></div></td>
+    {% endif %}
   </tr>
     {% endfor %}
   </table>
