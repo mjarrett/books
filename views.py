@@ -17,8 +17,6 @@ import json
 
 # Non-view helper functions
 def sort_by_attribute(object_list,att,rev):
-    print('hello')
-    print(rev)
     if rev=="True": rev=True
     elif rev=="False": rev=False
     if att == 'author':
@@ -75,7 +73,6 @@ def addbook(request,isbn):
 
     user = request.user
     user.book.add(b)
-    print(user)
     try:
         loc = user.location.get()
         loc.book.add(b)
@@ -160,10 +157,7 @@ def catsview(request):
 def profile(request,username):
     #print(request.user.groups.all(), User.objects.get(username=username).groups.all())
     if is_group_match(request.user,User.objects.get(username=username)):
-        print('test')
         object_list = [ b for b in Book.objects.all() if b.owner.username == username]
-        print(object_list)
-        #context = { 'object_list': object_list, 'profileuser':username}
 
         if request.method == 'GET' and  'att' in request.GET:
             att = request.GET.get('att')
@@ -179,8 +173,12 @@ def profile(request,username):
 
 @login_required
 def deletebook(request,pk):
-    Book.objects.filter(id=pk).delete()
-    return profile(request,request.user.username)
+    book = Book.objects.get(id=pk)
+    if book.owner.username == request.user.username:
+        book.delete()
+        return profile(request,request.user.username)
+    else:
+        return profile(request,request.user.username)
 
 def signup(request):
     if request.method == 'POST':
