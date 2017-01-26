@@ -70,11 +70,11 @@ def addbook(request,isbn):
     b.save()
 
     user = request.user
-    user.book_set.add(b)
+    user.book.add(b)
     print(user)
     try:
-        loc = user.location_set.get()
-        loc.book_set.add(b)
+        loc = user.location.get()
+        loc.book.add(b)
     except:
         print("This user doesn't have a location")
 
@@ -83,10 +83,10 @@ def addbook(request,isbn):
         cat = cat.title() #ensure categories are in Title Case
         try: #try to get a handle on a category if it exists
             c = Category.objects.get(category=cat)
-            b.category_set.add(c)
+            b.category.add(c)
         except: # if it doesn't, make it
             #c = Category(category=cat)
-            b.category_set.create(category=cat)
+            b.category.create(category=cat)
 
     return inputview(request,book_added=True)
 
@@ -154,9 +154,11 @@ def catsview(request):
 
 @login_required
 def profile(request,username):
-    print(request.user.groups.all(), User.objects.get(username=username).groups.all())
+    #print(request.user.groups.all(), User.objects.get(username=username).groups.all())
     if is_group_match(request.user,User.objects.get(username=username)):
+        print('test')
         object_list = [ b for b in Book.objects.all() if b.owner.username == username]
+        print(object_list)
         #context = { 'object_list': object_list, 'profileuser':username}
 
         if request.method == 'GET' and  'att' in request.GET:
