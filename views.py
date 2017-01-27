@@ -112,11 +112,12 @@ def booksview(request):
 @login_required
 def bookview(request,pk):
     book = Book.objects.get(id=pk)
+    catstring = ", ".join([ cat.category for cat in book.category.all() ])
     if is_group_match(book.owner,request.user):
         if book.owner == request.user:
-            context = {'book':book, 'isowner':True}
+            context = {'book':book, 'isowner':True, 'catstring':catstring}
         else:
-            context = {'book':book, 'isowner':False}
+            context = {'book':book, 'isowner':False, 'catstring':catstring}
     else:
         context = {}
     return render(request, 'lib/book.html', context)
@@ -127,16 +128,24 @@ def editbookview(request,pk):
 
     if request.method == 'POST' and 'editbooksub' in request.POST:
         f = EditBookForm(request.POST, instance=book)
-        book = f.save(commit=False)
-        try:
-            cat = Category.objects.get(category=request.POST['formcategory'])
-            book.category.add(cat)
-        except:
-            book.category.create(category=request.POST['formcategory'])
+        book = f.save(commit=False) #don't save book object till we've added categories
+
+        book.category.clear() #clear categories in preparation for input
+        catlist = request.POST['formcategory'].split(',')
+        catlist = [ c.strip() for c in catlist]
+
+        for cat in catlist:
+            try:
+                cat = Category.objects.get(category=cat)
+                book.category.add(cat)
+            except:
+                book.category.create(category=cat)
+
         book.save()
         return render(request, 'lib/book.html', {'book':book})
 
-    form = EditBookForm(instance=book, initial={'formcategory':book.category.all()[0].category})
+    catstring = ", ".join([ cat.category for cat in book.category.all() ])
+    form = EditBookForm(instance=book, initial={'formcategory':catstring})
     if request.user != book.owner:
         return render(request, 'lib/book.html', {'book':book})
     return render(request, 'lib/editbook.html', {'book':book, 'form':form})

@@ -12,14 +12,14 @@
 <table>
 {% if isowner %}
 <tr>
-    <td><a href="{% url 'lib:editbook' book.id %}">Edit this book's properties</a>
+    <td><a href="{% url 'lib:editbook' book.id %}">Edit</a>
 </tr>
 {% endif %}
 <tr>
   <td> Author:</td> <td>{{book.author}} </td>
 </tr>
 <tr>
-  <td> Category: </td><td>{% for cat in book.category.all %} {{ cat }} {% endfor %}</td>
+  <td> Category: </td><td>{{catstring}}</td>
 </tr>
 <tr>
   <td> ISBN: </td><td>{{book.isbn }}</td>

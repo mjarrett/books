@@ -15,14 +15,14 @@ class Location(models.Model):
 
 class Book(models.Model):
 
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, related_name='book')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='book')
-    title = models.CharField(max_length=200, null=True)
-    isbn = models.IntegerField(default=-1)
-    author = models.CharField(max_length=200,null=True)
-    thumbnail = models.URLField(max_length=500,null=True)
-    description = models.CharField(max_length=3000,null=True)
-    preview = models.CharField(max_length=200,null=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True, related_name='book')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='book', null=True, blank=True)
+    title = models.CharField(max_length=200, null=True, default=None, blank=True)
+    isbn = models.IntegerField(default=None, null=True, blank=True)
+    author = models.CharField(max_length=200,null=True, default=None, blank=True)
+    thumbnail = models.URLField(max_length=500,null=True, default=None, blank=True)
+    description = models.CharField(max_length=3000,null=True, default=None, blank=True)
+    preview = models.CharField(max_length=200,null=True, default=None, blank=True)
     date_added = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -53,7 +53,8 @@ class EditBookForm(ModelForm):
     class Meta:
         model=Book
         fields = ['title','author','isbn','owner','description']
-    formcategory = CharField(max_length=200)
+        help_texts = {}
+    formcategory = CharField(max_length=200, required=False)
 
 # class Choice(models.Model):
 #     question = models.ForeignKey(Question, on_delete=models.CASCADE)

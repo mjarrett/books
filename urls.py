@@ -24,8 +24,5 @@ urlpatterns = [
     url(r'^logout/$', auth_views.logout, {'template_name': 'lib/logged_out.html'}, name='logout'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^joingroup/$', views.joingroup, name='joingroup'),
-    #url(r'^books/$', views.BooksView.as_view(), name='books'),
-    #url(r'^book/(?P<pk>[0-9]+)/$', views.BookView.as_view(), name='book'),
-
 
     ]
