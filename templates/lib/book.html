@@ -10,6 +10,11 @@
 <h1>{{ book.title }}</h1>
 <img src="{{book.thumbnail}}" alt="Cover" style="width:300px;">
 <table>
+{% if isowner %}
+<tr>
+    <td><a href="{% url 'lib:editbook' book.id %}">Edit this book's properties</a>
+</tr>
+{% endif %}
 <tr>
   <td> Author:</td> <td>{{book.author}} </td>
 </tr>
@@ -20,14 +25,12 @@
   <td> ISBN: </td><td>{{book.isbn }}</td>
 </tr>
 <tr>
-  <td> Location: </td><td>{{book.location}} </td>
-</tr>
-<tr>
   <td> Owner: </td><td>{{book.owner.username}} </td>
 </tr>
 </table>
 
-<p>{{book.description}}</p>
+
+<p>Summary: {{book.description}}</p>
 <a href="{{book.preview}}">Google Books Preview</a>
 {% else %}
 <p>You do not have permission to view this book</p>

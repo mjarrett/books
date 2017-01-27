@@ -49,6 +49,12 @@ class UserForm(ModelForm):
 class GroupForm(Form):
     groupcode = CharField(label='Group Code',max_length=100)
 
+class EditBookForm(ModelForm):
+    class Meta:
+        model=Book
+        fields = ['title','author','isbn','owner','description']
+    formcategory = CharField(max_length=200)
+
 # class Choice(models.Model):
 #     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 #     choice_text = models.CharField(max_length=200)
