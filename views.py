@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login
 
 
 from django.contrib.auth.models import User, Group
-from lib.models import Book, Category, Location, UserForm, GroupForm
+from lib.models import Book, Category, Location, UserForm, GroupForm, EditBookForm
 
 import group_codes
 import requests
@@ -112,11 +112,52 @@ def booksview(request):
 @login_required
 def bookview(request,pk):
     book = Book.objects.get(id=pk)
+    catstring = ", ".join([ cat.category for cat in book.category.all() ])
     if is_group_match(book.owner,request.user):
-        context = {'book':book}
+        if book.owner == request.user:
+            context = {'book':book, 'isowner':True, 'catstring':catstring}
+        else:
+            context = {'book':book, 'isowner':False, 'catstring':catstring}
     else:
         context = {}
     return render(request, 'lib/book.html', context)
+
+@login_required
+def editbookview(request,pk):
+    book = Book.objects.get(id=pk)
+
+    if request.method == 'POST' and 'editbooksub' in request.POST:
+        f = EditBookForm(request.POST, instance=book)
+        book = f.save(commit=False) #don't save book object till we've added categories
+
+        book.category.clear() #clear categories in preparation for input
+        catlist = request.POST['formcategory'].split(',')
+        catlist = [ c.strip() for c in catlist]
+
+        for cat in catlist:
+            try:
+                cat = Category.objects.get(category=cat)
+                book.category.add(cat)
+            except:
+                book.category.create(category=cat)
+
+        book.save()
+        return render(request, 'lib/book.html', {'book':book})
+
+    catstring = ", ".join([ cat.category for cat in book.category.all() ])
+    form = EditBookForm(instance=book, initial={'formcategory':catstring})
+    if request.user != book.owner:
+        return render(request, 'lib/book.html', {'book':book})
+    return render(request, 'lib/editbook.html', {'book':book, 'form':form})
+
+@login_required
+def createbookview(request):
+    book = Book(owner=request.user)
+    book.save()
+    pk = book.id
+    context = {'book':book, 'form':EditBookForm(instance=book)}
+    return redirect('/lib/edit/'+str(pk))
+
 
 @login_required
 def authorview(request,authorname):
@@ -156,6 +197,7 @@ def catsview(request):
 
 @login_required
 def profile(request,username):
+
     #print(request.user.groups.all(), User.objects.get(username=username).groups.all())
     if is_group_match(request.user,User.objects.get(username=username)):
         object_list = [ b for b in Book.objects.all() if b.owner.username == username]

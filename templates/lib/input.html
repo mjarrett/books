@@ -18,6 +18,7 @@
 <input type="submit" value="Submit" />
 </form>
 
+<a href="{% url 'lib:createbook' %}">Add a custom book</a>
 {% if added %}
 <p>Book successfully added to library</p>
 {% endif %}
