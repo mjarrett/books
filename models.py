@@ -17,7 +17,7 @@ class Book(models.Model):
 
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True, related_name='book')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='book', null=True, blank=True)
-    title = models.CharField(max_length=200, null=True, default=None, blank=True)
+    title = models.CharField(max_length=200, null=False, default=None, blank=False)
     isbn = models.IntegerField(default=None, null=True, blank=True)
     author = models.CharField(max_length=200,null=True, default=None, blank=True)
     thumbnail = models.URLField(max_length=500,null=True, default=None, blank=True)

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views import generic
 from django.contrib.auth.decorators import login_required
@@ -149,6 +149,15 @@ def editbookview(request,pk):
     if request.user != book.owner:
         return render(request, 'lib/book.html', {'book':book})
     return render(request, 'lib/editbook.html', {'book':book, 'form':form})
+
+@login_required
+def createbookview(request):
+    book = Book(owner=request.user)
+    book.save()
+    pk = book.id
+    context = {'book':book, 'form':EditBookForm(instance=book)}
+    return redirect('/lib/edit/'+str(pk))
+
 
 @login_required
 def authorview(request,authorname):
