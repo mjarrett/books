@@ -4,7 +4,7 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login
-
+from django.db.models import Q
 
 from django.contrib.auth.models import User, Group
 from lib.models import Book, Category, Location, UserForm, GroupForm, EditBookForm
@@ -146,6 +146,11 @@ def editbookview(request,pk):
 
     catstring = ", ".join([ cat.category for cat in book.category.all() ])
     form = EditBookForm(instance=book, initial={'formcategory':catstring})
+
+    #filter the list of users in the dropdown menu
+    usergroups = [ group for group in request.user.groups.all() ]
+    form.fields['owner'].queryset = User.objects.filter(groups__in=usergroups).distinct()
+
     if request.user != book.owner:
         return render(request, 'lib/book.html', {'book':book})
     return render(request, 'lib/editbook.html', {'book':book, 'form':form})
