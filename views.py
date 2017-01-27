@@ -142,7 +142,7 @@ def editbookview(request,pk):
                 book.category.create(category=cat)
 
         book.save()
-        return render(request, 'lib/book.html', {'book':book})
+        return redirect('/lib/book/'+str(book.id))
 
     catstring = ", ".join([ cat.category for cat in book.category.all() ])
     form = EditBookForm(instance=book, initial={'formcategory':catstring})
