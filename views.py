@@ -126,6 +126,9 @@ def bookview(request,pk):
 def editbookview(request,pk):
     book = Book.objects.get(id=pk)
 
+    if request.user != book.owner:
+        return render(request, 'lib/book.html', {'book':book})
+
     if request.method == 'POST' and 'editbooksub' in request.POST:
         f = EditBookForm(request.POST, instance=book)
         book = f.save(commit=False) #don't save book object till we've added categories
@@ -151,13 +154,12 @@ def editbookview(request,pk):
     usergroups = [ group for group in request.user.groups.all() ]
     form.fields['owner'].queryset = User.objects.filter(groups__in=usergroups).distinct()
 
-    if request.user != book.owner:
-        return render(request, 'lib/book.html', {'book':book})
+
     return render(request, 'lib/editbook.html', {'book':book, 'form':form})
 
 @login_required
 def createbookview(request):
-    book = Book(owner=request.user)
+    book = Book(owner=request.user, title='New Book')
     book.save()
     pk = book.id
     context = {'book':book, 'form':EditBookForm(instance=book)}

@@ -8,7 +8,9 @@
 
 {% if book %}
 <h1>{{ book.title }}</h1>
+{% if book.thumbnail is not None %}
 <img src="{{book.thumbnail}}" alt="Cover" style="width:300px;">
+{% endif %}
 <table>
 {% if isowner %}
 <tr>

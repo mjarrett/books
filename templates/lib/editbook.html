@@ -12,8 +12,10 @@
 {% csrf_token %}
 
 <h1>{{ form.title }}</h1>
-<img src="{{book.thumbnail}}" alt="Cover" style="width:300px;" />
 
+{% if book.thumbnail %}
+<img src="{{book.thumbnail}}" alt="Cover" style="width:300px;" />
+{% endif %}
 
 
 
