@@ -1,0 +1,24 @@
+{% extends "lib/base.html" %}
+
+{% block title %}Genres{% endblock %}
+
+{% block content %}
+
+{% include "lib/header.html" %}
+
+
+{% if object_list %}
+<h1>Groups</h1>
+  <table>
+    {% for group in object_list %}
+    <td><a href="{% url 'lib:group' group.id %}">{{group.name}}</a></td>
+  <tr>
+
+  </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  <p>No groups available</p>
+{% endif %}
+
+{% endblock %}

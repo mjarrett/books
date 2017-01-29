@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.forms import Form, ModelForm, CharField, PasswordInput
 from django.utils import timezone
 # Create your models here.
@@ -56,7 +56,7 @@ class EditBookForm(ModelForm):
         fields = ['title','author','isbn','owner','description']
         help_texts = {}
     formcategory = CharField(max_length=200, required=False)
-    
+
 
 # class Choice(models.Model):
 #     question = models.ForeignKey(Question, on_delete=models.CASCADE)

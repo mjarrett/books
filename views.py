@@ -37,7 +37,14 @@ def book_google_lookup(query):
 def is_group_match(user1, user2):
     return any(x in user1.groups.all() for x in user2.groups.all())
 
-
+def sort_books(request, book_list):
+    if request.method == 'GET' and  'att' in request.GET:
+        att = request.GET.get('att')
+        reverse = request.GET.get('reverse')
+    else:
+        att='id'
+        reverse = False
+    return sort_by_attribute(book_list,att,reverse)
 
 # View functions
 def index(request):
@@ -97,18 +104,11 @@ def addbook(request,googleid):
 
 @login_required
 def booksview(request):
-    object_list = Book.objects.all()
     #only return books if user in matching group
-    object_list = [ b for b in object_list if is_group_match(b.owner,request.user) ]
-    if request.method == 'GET' and  'att' in request.GET:
-        att=request.GET.get('att')
-        reverse = request.GET.get('reverse')
-    else:
-        att='id'
-        reverse = True
-    context = {'object_list':sort_by_attribute(object_list,att,reverse)}
-
-    return render(request, 'lib/books.html', context)
+    book_list = [ b for b in Book.objects.all() if is_group_match(b.owner,request.user) ]
+    book_list = sort_books(request, book_list)
+    context = {'book_list':book_list, 'subhead': 'All books available to you'}
+    return render(request, 'lib/booksublist.html', context)
 
 @login_required
 def bookview(request,pk):
@@ -169,10 +169,11 @@ def createbookview(request):
 
 @login_required
 def authorview(request,authorname):
-    book_list = Book.objects.filter(author=authorname)
-    book_list = [ b for b in book_list if is_group_match(b.owner,request.user)]
-    context = {'book_list':book_list,'author':authorname}
-    return render(request, 'lib/author.html', context)
+    book_list = [ b for b in Book.objects.filter(author=authorname) if is_group_match(b.owner,request.user)]
+    book_list = sort_books(request, book_list)
+    context = {'book_list':book_list, 'subhead': 'All book by {}'.format(authorname)}
+    return render(request, 'lib/booksublist.html', context)
+
 
 @login_required
 def authorsview(request):
@@ -181,19 +182,28 @@ def authorsview(request):
     return render(request, 'lib/authors.html', context)
 
 @login_required
+def groupsview(request):
+    object_list = [ group for group in request.user.groups.all() if group.name != request.user.username ]
+    context = {'object_list':object_list}
+    return render(request, 'lib/groups.html', context)
+
+@login_required
+def groupview(request,pk):
+    group = Group.objects.get(id=pk)
+    book_list = [book for book in Book.objects.all() if group in book.owner.groups.all()]
+    book_list = sort_books(request, book_list)
+    context = {'book_list':book_list, 'subhead': 'All books in group {}'.format(group.name)}
+    return render(request, 'lib/booksublist.html', context)
+
+
+
+@login_required
 def catview(request,pk):
     cat = Category.objects.get(id=pk)
-    book_list = cat.book.all()
-    book_list = [ b for b in book_list if is_group_match(b.owner,request.user)]
-    #context = {'book_list':book_list,'category':cat}
-    if request.method == 'GET' and  'att' in request.GET:
-        att = request.GET.get('att')
-        reverse = request.GET.get('reverse')
-    else:
-        att='id'
-        reverse = False
-    context = {'book_list':sort_by_attribute(book_list,att,reverse),'category':cat}
-    return render(request, 'lib/genre.html', context)
+    book_list = [ b for b in cat.book.all() if is_group_match(b.owner,request.user)]
+    book_list = sort_books(request, book_list)
+    context = {'book_list':book_list, 'subhead': 'In group {}'.format(group.name)}
+    return render(request, 'lib/booksublist.html', context)
 
 @login_required
 def catsview(request):
@@ -208,17 +218,11 @@ def profile(request,username):
     profileuser = User.objects.get(username=username)
     #print(request.user.groups.all(), User.objects.get(username=username).groups.all())
     if is_group_match(request.user,profileuser):
-        object_list = [ b for b in Book.objects.all() if b.owner.username == username]
+        book_list = [ b for b in Book.objects.all() if b.owner.username == username]
+        book_list = sort_books(request,book_list)
+        context = {'book_list':book_list, 'subhead': 'Added by {} {}'.format(profileuser.first_name,profileuser.last_name[0])}
+        return render(request, 'lib/booksublist.html', context)
 
-        if request.method == 'GET' and  'att' in request.GET:
-            att = request.GET.get('att')
-            reverse = request.GET.get('reverse')
-        else:
-            att='id'
-            reverse = False
-        context = {'object_list':sort_by_attribute(object_list,att,reverse), 'profileuser':profileuser}
-
-        return render(request, 'lib/profile.html', context)
     else:
         return HttpResponse("You do not have permission to view this page")
 
