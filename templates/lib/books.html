@@ -23,7 +23,7 @@
     <td>{% for cat in book.category.all%}
       <a href="{% url 'lib:genre' cat.id %}">{{cat}} </a>
       {% endfor %}</td>
-    <td><a href="{% url 'lib:profile' book.owner %}">{{book.owner.username}}</a>
+    <td><a href="{% url 'lib:profile' book.owner.username %}">{{book.owner.first_name}} {{book.owner.last_name.0}}</a>
   </tr>
     {% endfor %}
   </table>

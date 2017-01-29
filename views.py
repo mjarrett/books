@@ -153,7 +153,7 @@ def editbookview(request,pk):
     #filter the list of users in the dropdown menu
     usergroups = [ group for group in request.user.groups.all() ]
     form.fields['owner'].queryset = User.objects.filter(groups__in=usergroups).distinct()
-
+    form.fields['owner'].label_from_instance = lambda obj: "{} {}".format(obj.first_name, obj.last_name[0])
 
     return render(request, 'lib/editbook.html', {'book':book, 'form':form})
 
@@ -204,9 +204,9 @@ def catsview(request):
 
 @login_required
 def profile(request,username):
-
+    profileuser = User.objects.get(username=username)
     #print(request.user.groups.all(), User.objects.get(username=username).groups.all())
-    if is_group_match(request.user,User.objects.get(username=username)):
+    if is_group_match(request.user,profileuser):
         object_list = [ b for b in Book.objects.all() if b.owner.username == username]
 
         if request.method == 'GET' and  'att' in request.GET:
@@ -215,7 +215,7 @@ def profile(request,username):
         else:
             att='id'
             reverse = False
-        context = {'object_list':sort_by_attribute(object_list,att,reverse), 'profileuser':username}
+        context = {'object_list':sort_by_attribute(object_list,att,reverse), 'profileuser':profileuser}
 
         return render(request, 'lib/profile.html', context)
     else:

@@ -6,6 +6,7 @@ from django.forms import Form, ModelForm, CharField, PasswordInput
 from django.utils import timezone
 # Create your models here.
 
+
 class Location(models.Model):
     location = models.CharField(max_length=200, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, related_name='location')
@@ -55,6 +56,7 @@ class EditBookForm(ModelForm):
         fields = ['title','author','isbn','owner','description']
         help_texts = {}
     formcategory = CharField(max_length=200, required=False)
+    
 
 # class Choice(models.Model):
 #     question = models.ForeignKey(Question, on_delete=models.CASCADE)
