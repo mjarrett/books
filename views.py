@@ -53,6 +53,7 @@ def inputview(request,book_added=False):
         context = {'added_book':new_book_title}
         grj = book_google_lookup(new_book_title)
         top_matches = grj['items'][0:15]
+        print([x['id'] for x in top_matches])
         context = {'matches':top_matches}
     else:
         context = {'matches':None}
@@ -60,9 +61,9 @@ def inputview(request,book_added=False):
 
 
 @login_required
-def addbook(request,isbn):
-    grj = book_google_lookup('isbn:'+ isbn)
-    b = Book(isbn=isbn,
+def addbook(request,googleid):
+    grj = book_google_lookup('id:'+ googleid)
+    b = Book(
             author=grj['items'][0]['volumeInfo']['authors'][0],
             title=grj['items'][0]['volumeInfo']['title'],
             thumbnail=grj['items'][0]['volumeInfo']['imageLinks']['thumbnail'],

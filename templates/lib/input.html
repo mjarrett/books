@@ -28,12 +28,8 @@
 <table>
   {%for match in matches %}
   <tr>
-  {% for id in match.volumeInfo.industryIdentifiers %}
-  {% if id.type == "ISBN_13" %}
-  <td><a href="{% url 'lib:addbook' id.identifier  %}"><img src="{{match.volumeInfo.imageLinks.smallThumbnail}}" alt="Cover" style="width:100px;"></a></td>
+  <td><a href="{% url 'lib:addbook' match.id  %}"><img src="{{match.volumeInfo.imageLinks.smallThumbnail}}" alt="Cover" style="width:100px;"></a></td>
   <td>{{match.volumeInfo.title}}, {{match.volumeInfo.authors.0}}, {{match.volumeInfo.publishedDate}}</td>
-  {% endif %}
-  {% endfor %}
   </tr>
   {% endfor %}
 </table>
