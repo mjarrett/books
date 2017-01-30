@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login
 from django.db.models import Q
+from django.core.mail import send_mail
+
 
 from django.contrib.auth.models import User, Group
 from lib.models import Book, Category, Location, UserForm, GroupForm, EditBookForm
@@ -16,6 +18,8 @@ import json
 #Login and logout views handled automatically from urls.py
 
 # Non-view helper functions
+
+
 def sort_by_attribute(object_list,att,rev):
     if rev=="True": rev=True
     elif rev=="False": rev=False
@@ -43,7 +47,7 @@ def sort_books(request, book_list):
         reverse = request.GET.get('reverse')
     else:
         att='id'
-        reverse = False
+        reverse = True
     return sort_by_attribute(book_list,att,reverse)
 
 # View functions
@@ -53,6 +57,7 @@ def index(request):
 
 @login_required
 def inputview(request,book_added=False):
+
     if book_added:
         context = {'added':True}
     elif 'book' in request.POST:
@@ -133,10 +138,12 @@ def editbookview(request,pk=None):
             book.save()
         else:
             book = Book.objects.get(id=pk)
+
+        print(request.POST)
+        if request.POST['title'] == "":
+            request.POST['title'] = "No Title"
         f = EditBookForm(request.POST, instance=book)
-        print('test1')
         book = f.save(commit=False) #don't save book object till we've added categories
-        print('test2')
         if book.title == "":
             book.title = "No title"
             book.save()
@@ -270,6 +277,8 @@ def signup(request):
             selfgroup.save()
             selfgroup.user_set.add(user)
             user = authenticate(username=request.POST['username'], password=request.POST['password'])
+            send_mail('New user', '{} \n {} {} \n {}'.format(user.username,user.first_name,user.last_name,user.email), 'admin@mikejarrett.ca',
+                ['msjarrett@gmail.com'], fail_silently=False)
             if user is not None:
                 login(request, user)
                 return joingroup(request)
