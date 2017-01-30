@@ -74,15 +74,26 @@ def inputview(request,book_added=False):
 @login_required
 def addbook(request,googleid):
     grj = book_google_lookup('id:'+ googleid)
-    b = Book(
-            author=grj['items'][0]['volumeInfo']['authors'][0],
-            title=grj['items'][0]['volumeInfo']['title'],
-            thumbnail=grj['items'][0]['volumeInfo']['imageLinks']['thumbnail'],
-            description=grj['items'][0]['volumeInfo']['description'],
-            preview=grj['items'][0]['volumeInfo']['previewLink'],
-            )
-    b.save()
+    volinfo = grj['items'][0]['volumeInfo']
+    b = Book( title=volinfo['title'] )
 
+    b.save()
+    print(b)
+    if 'authors' in volinfo:
+        b.author = volinfo['authors'][0]
+    else:
+        b.author = "No Author"
+    if 'imageLinks' in volinfo:
+        b.thumbnail = volinfo['imageLinks']['thumbnail']
+    if 'description' in volinfo:
+        b.description = volinfo['description']
+    if 'previewLink' in volinfo:
+        b.preview = volinfo['previewLink']
+        
+
+    b.save()
+    print(b, b.id)
+    
     user = request.user
     user.book.add(b)
     try:
@@ -228,7 +239,7 @@ def catview(request,pk):
     cat = Category.objects.get(id=pk)
     book_list = [ b for b in cat.book.all() if is_group_match(b.owner,request.user)]
     book_list = sort_books(request, book_list)
-    context = {'book_list':book_list, 'subhead': 'In group {}'.format(group.name)}
+    context = {'book_list':book_list, 'subhead': 'In genre {}'.format(cat.category)}
     return render(request, 'lib/booksublist.html', context)
 
 @login_required
@@ -277,8 +288,10 @@ def signup(request):
             selfgroup.save()
             selfgroup.user_set.add(user)
             user = authenticate(username=request.POST['username'], password=request.POST['password'])
-            send_mail('New user', '{} \n {} {} \n {}'.format(user.username,user.first_name,user.last_name,user.email), 'admin@mikejarrett.ca',
-                ['msjarrett@gmail.com'], fail_silently=False)
+            try:
+                send_mail('New user', '{} \n {} {} \n {}'.format(user.username,user.first_name,user.last_name,user.email), 'admin@mikejarrett.ca', ['msjarrett@gmail.com'], fail_silently=False)
+            except:
+                print("Notification email failed")
             if user is not None:
                 login(request, user)
                 return joingroup(request)

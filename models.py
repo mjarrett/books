@@ -53,7 +53,7 @@ class GroupForm(Form):
 class EditBookForm(ModelForm):
     class Meta:
         model=Book
-        fields = ['title','author','isbn','owner','description']
+        fields = ['title','author','owner','description']
         #help_texts = {}
     formcategory = CharField(max_length=200, required=False)
 
