@@ -13,8 +13,8 @@ urlpatterns = [
     url(r'^addbook/(?P<googleid>[\w\W]+)/$',views.addbook,name='addbook'),
     url(r'^books/$', views.booksview, name='books'),
     url(r'^book/(?P<pk>[0-9]+)/$', views.bookview, name='book'),
-    url(r'^edit/(?P<pk>[0-9]+)/$', views.editbookview, name='editbook'),
-    url(r'^create/$', views.createbookview, name='createbook'),
+    url(r'^edit/(?P<pk>[0-9]*)/$', views.editbookview, name='editbook'),
+    url(r'^create/$', views.editbookview, name='createbook'),
     url(r'^delete/(?P<pk>[0-9]+)/$',views.deletebook,name='delete'),
     url(r'^genre/(?P<pk>[0-9]+)/$', views.catview, name='genre'),
     url(r'^genres/$', views.catsview, name='genres'),
@@ -27,5 +27,7 @@ urlpatterns = [
     url(r'^logout/$', auth_views.logout, {'template_name': 'lib/logged_out.html'}, name='logout'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^joingroup/$', views.joingroup, name='joingroup'),
+    url(r'^about/$', views.aboutview, name='about'),
+
 
     ]

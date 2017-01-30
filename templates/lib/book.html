@@ -14,7 +14,7 @@
 <table>
 {% if isowner %}
 <tr>
-    <td><a href="{% url 'lib:editbook' book.id %}">Edit</a>
+    <td><a href="{% url 'lib:editbook' book.id %}">Edit</a> | <a href="{% url 'lib:delete' book.id %}">Delete</a>
 </tr>
 {% endif %}
 <tr>

@@ -13,7 +13,7 @@
 
 <p>Enter the title, author, and/or isbn of the book you'd like to add</p>
 <form action="{% url 'lib:input' %}" method="post">
-{% csrf_token %} <! This is a security measure that should be added to all POST forms>
+{% csrf_token %} 
 <input type="text" name="book" id="book" value="" />
 <input type="submit" value="Submit" />
 </form>

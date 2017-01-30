@@ -18,9 +18,9 @@ class Book(models.Model):
 
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True, related_name='book')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='book', null=True, blank=True)
-    title = models.CharField(max_length=200, null=False, default=None, blank=False)
+    title = models.CharField(max_length=200, null=False, default='No Title', blank=False)
     isbn = models.IntegerField(default=None, null=True, blank=True)
-    author = models.CharField(max_length=200,null=True, default=None, blank=True)
+    author = models.CharField(max_length=200,null=True, default='No author', blank=True)
     thumbnail = models.URLField(max_length=500,null=True, default=None, blank=True)
     description = models.TextField(max_length=3000,null=True, default=None, blank=True)
     preview = models.CharField(max_length=200,null=True, default=None, blank=True)
@@ -45,7 +45,7 @@ class UserForm(ModelForm):
     class Meta:
         model = User
         fields = ['username','first_name','last_name','password','email']
-        help_texts = {'username': None}
+        #help_texts = {'username': None}
 
 class GroupForm(Form):
     groupcode = CharField(label='Group Code',max_length=100)
@@ -54,7 +54,7 @@ class EditBookForm(ModelForm):
     class Meta:
         model=Book
         fields = ['title','author','isbn','owner','description']
-        help_texts = {}
+        #help_texts = {}
     formcategory = CharField(max_length=200, required=False)
 
 

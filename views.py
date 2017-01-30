@@ -59,8 +59,7 @@ def inputview(request,book_added=False):
         new_book_title = request.POST['book']
         context = {'added_book':new_book_title}
         grj = book_google_lookup(new_book_title)
-        top_matches = grj['items'][0:15]
-        print([x['id'] for x in top_matches])
+        top_matches = grj['items'][0:25]
         context = {'matches':top_matches}
     else:
         context = {'matches':None}
@@ -124,16 +123,26 @@ def bookview(request,pk):
     return render(request, 'lib/book.html', context)
 
 @login_required
-def editbookview(request,pk):
-    book = Book.objects.get(id=pk)
+def editbookview(request,pk=None):
 
-    if request.user != book.owner:
-        return render(request, 'lib/book.html', {'book':book})
 
+    # if we're catching a filled in form
     if request.method == 'POST' and 'editbooksub' in request.POST:
+        if pk == None:
+            book = Book(title='Title')
+            book.save()
+        else:
+            book = Book.objects.get(id=pk)
         f = EditBookForm(request.POST, instance=book)
+        print('test1')
         book = f.save(commit=False) #don't save book object till we've added categories
-
+        print('test2')
+        if book.title == "":
+            book.title = "No title"
+            book.save()
+        if book.author == "":
+            book.author = "No author"
+            book.save()
         book.category.clear() #clear categories in preparation for input
         catlist = request.POST['formcategory'].split(',')
         catlist = [ c.strip() for c in catlist]
@@ -148,23 +157,33 @@ def editbookview(request,pk):
         book.save()
         return redirect('/lib/book/'+str(book.id))
 
-    catstring = ", ".join([ cat.category for cat in book.category.all() ])
-    form = EditBookForm(instance=book, initial={'formcategory':catstring})
+    # if it's a fresh load
+    else:
+        if pk == None: #if we're making a new book
+            form = EditBookForm(initial={'title':'Title', 'owner':request.user})
+            book = None
+        else: # if we're editing a saved book
+            book = Book.objects.get(id=pk)
+                # if user not allowed to edit book:
+            if  request.user != book.owner:
+                return render(request, 'lib/book.html', {'book':book})
+            catstring = ", ".join([ cat.category for cat in book.category.all() ])
+            form = EditBookForm(instance=book, initial={'formcategory':catstring})
 
-    #filter the list of users in the dropdown menu
-    usergroups = [ group for group in request.user.groups.all() ]
-    form.fields['owner'].queryset = User.objects.filter(groups__in=usergroups).distinct()
-    form.fields['owner'].label_from_instance = lambda obj: "{} {}".format(obj.first_name, obj.last_name[0])
+        #filter the list of users in the dropdown menu, show first name+initial
+        usergroups = [ group for group in request.user.groups.all() ]
+        form.fields['owner'].queryset = User.objects.filter(groups__in=usergroups).distinct()
+        form.fields['owner'].label_from_instance = lambda obj: "{} {}".format(obj.first_name, obj.last_name[0])
 
-    return render(request, 'lib/editbook.html', {'book':book, 'form':form})
+        return render(request, 'lib/editbook.html', {'book':book, 'form':form})
 
-@login_required
-def createbookview(request):
-    book = Book(owner=request.user, title='New Book')
-    book.save()
-    pk = book.id
-    context = {'book':book, 'form':EditBookForm(instance=book)}
-    return redirect('/lib/edit/'+str(pk))
+# @login_required
+# def createbookview(request):
+#     book = Book(owner=request.user, title='New Book')
+#     book.save()
+#     pk = book.id
+#     context = {'book':book, 'form':EditBookForm(instance=book)}
+#     return redirect('/lib/edit/'+str(pk))
 
 
 @login_required
@@ -282,6 +301,9 @@ def joingroup(request):
 
     context = {'form':GroupForm()}
     return render(request, 'lib/joingroup.html',context)
+
+def aboutview(request):
+    return render(request,'lib/about.html')
 
 
 #View classes
