@@ -8,24 +8,26 @@
 
 {% if book %}
 <h1>{{ book.title }}</h1>
+{% if book.thumbnail %}
 <img src="{{book.thumbnail}}" alt="Cover" style="width:300px;">
+{% endif %}
 <table>
 {% if isowner %}
 <tr>
-    <td><a href="{% url 'lib:editbook' book.id %}">Edit</a>
+    <td><a href="{% url 'lib:editbook' book.id %}">Edit</a> | <a href="{% url 'lib:delete' book.id %}">Delete</a>
 </tr>
 {% endif %}
 <tr>
   <td> Author:</td> <td>{{book.author}} </td>
 </tr>
 <tr>
-  <td> Category: </td><td>{{catstring}}</td>
+  <td> Genres: </td><td>{{catstring}}</td>
 </tr>
 <tr>
   <td> ISBN: </td><td>{{book.isbn }}</td>
 </tr>
 <tr>
-  <td> Owner: </td><td>{{book.owner.username}} </td>
+  <td> Owner: </td><td>{{book.owner.first_name}} {{book.owner.last_name.0}} </td>
 </tr>
 </table>
 

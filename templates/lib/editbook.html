@@ -7,13 +7,18 @@
 {% include "lib/header.html" %}
 
 {% if book %}
-
 <form  action="{% url 'lib:editbook' book.id %}" method="post">
+{% else %}
+<form  action="{% url 'lib:createbook' %}" method="post">
+{% endif %}
+
 {% csrf_token %}
-
 <h1>{{ form.title }}</h1>
-<img src="{{book.thumbnail}}" alt="Cover" style="width:300px;" />
 
+{% if book %}
+{% if book.thumbnail %}
+<img src="{{book.thumbnail}}" alt="Cover" style="width:300px;" />
+{% endif %} {% endif %}
 
 
 
@@ -25,7 +30,7 @@
   <td> Author:</td> <td>{{form.author}} </td>
 </tr>
 <tr>
-  <td> Category: </td><td>{{form.formcategory}} </td>
+  <td> Genres: </td><td>{{form.formcategory}} </td>
 </tr>
 <tr>
   <td> ISBN: </td><td>{{form.isbn }}</td>
@@ -39,9 +44,9 @@
 <p>Summary:</p> {{form.description}}
 </form>
 
+{% if book %}
+{% if book.preview %}
 <a href="{{book.preview}}">Google Books Preview</a>
-{% else %}
-<p>You do not have permission to view this book</p>
-{% endif %}
+{% endif %} {%endif%}
 
 {% endblock %}
