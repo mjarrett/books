@@ -260,6 +260,8 @@ def signup(request):
             form = UserForm(request.POST)
             if User.objects.filter(username=request.POST['username']).exists() or request.POST['username'] in group_codes.group_codes.values():
                 return render(request, 'lib/signup.html', {'form':UserForm(), 'error':"Sorry, your user name is alread being used. Please try again"})
+            if request.POST['first_name'] == "" or request.POST['last_name'] == "":
+                return render(request, 'lib/signup.html', {'form':UserForm(), 'error':"Please complete all fields!"})
             try:
                 user = User.objects.create_user(username=request.POST['username'],email=request.POST['email'],password=request.POST['password'], first_name=request.POST['first_name'],last_name=request.POST['last_name'])
             except:
