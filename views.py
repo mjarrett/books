@@ -28,7 +28,13 @@ def sort_by_attribute(object_list,att,rev):
     elif att == 'owner':
         return sorted(object_list, key=lambda x: x.owner.username, reverse=rev)
     elif att == 'category':
-        return sorted(object_list, key=lambda x: list(x.category.all())[0].category, reverse=rev)
+        def catornone(obj):
+            try:
+                return obj.category.all()[0].category
+            except:
+                return ""        
+        return sorted(object_list, key=lambda x:catornone(x), reverse=rev)
+    
     else:
         return sorted(object_list, key=lambda x: getattr(x,att), reverse=rev)
 
