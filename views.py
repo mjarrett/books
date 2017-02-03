@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login
 from django.db.models import Q
+from django.core.mail import send_mail
+
 
 from django.contrib.auth.models import User, Group
 from lib.models import Book, Category, Location, UserForm, GroupForm, EditBookForm, CommentForm
@@ -16,6 +18,8 @@ import json
 #Login and logout views handled automatically from urls.py
 
 # Non-view helper functions
+
+
 def sort_by_attribute(object_list,att,rev):
     if rev=="True": rev=True
     elif rev=="False": rev=False
@@ -24,7 +28,13 @@ def sort_by_attribute(object_list,att,rev):
     elif att == 'owner':
         return sorted(object_list, key=lambda x: x.owner.username, reverse=rev)
     elif att == 'category':
-        return sorted(object_list, key=lambda x: list(x.category.all())[0].category, reverse=rev)
+        def catornone(obj):
+            try:
+                return obj.category.all()[0].category
+            except:
+                return ""        
+        return sorted(object_list, key=lambda x:catornone(x), reverse=rev)
+    
     else:
         return sorted(object_list, key=lambda x: getattr(x,att), reverse=rev)
 
@@ -43,7 +53,7 @@ def sort_books(request, book_list):
         reverse = request.GET.get('reverse')
     else:
         att='id'
-        reverse = False
+        reverse = True
     return sort_by_attribute(book_list,att,reverse)
 
 # View functions
@@ -53,6 +63,7 @@ def index(request):
 
 @login_required
 def inputview(request,book_added=False):
+
     if book_added:
         context = {'added':True}
     elif 'book' in request.POST:
@@ -69,15 +80,26 @@ def inputview(request,book_added=False):
 @login_required
 def addbook(request,googleid):
     grj = book_google_lookup('id:'+ googleid)
-    b = Book(
-            author=grj['items'][0]['volumeInfo']['authors'][0],
-            title=grj['items'][0]['volumeInfo']['title'],
-            thumbnail=grj['items'][0]['volumeInfo']['imageLinks']['thumbnail'],
-            description=grj['items'][0]['volumeInfo']['description'],
-            preview=grj['items'][0]['volumeInfo']['previewLink'],
-            )
-    b.save()
+    volinfo = grj['items'][0]['volumeInfo']
+    b = Book( title=volinfo['title'] )
 
+    b.save()
+    print(b)
+    if 'authors' in volinfo:
+        b.author = volinfo['authors'][0]
+    else:
+        b.author = "No Author"
+    if 'imageLinks' in volinfo:
+        b.thumbnail = volinfo['imageLinks']['thumbnail']
+    if 'description' in volinfo:
+        b.description = volinfo['description']
+    if 'previewLink' in volinfo:
+        b.preview = volinfo['previewLink']
+        
+
+    b.save()
+    print(b, b.id)
+    
     user = request.user
     user.book.add(b)
     try:
@@ -146,10 +168,12 @@ def editbookview(request,pk=None):
             book.save()
         else:
             book = Book.objects.get(id=pk)
+
+        print(request.POST)
+        if request.POST['title'] == "":
+            request.POST['title'] = "No Title"
         f = EditBookForm(request.POST, instance=book)
-        print('test1')
         book = f.save(commit=False) #don't save book object till we've added categories
-        print('test2')
         if book.title == "":
             book.title = "No title"
             book.save()
@@ -234,7 +258,7 @@ def catview(request,pk):
     cat = Category.objects.get(id=pk)
     book_list = [ b for b in cat.book.all() if is_group_match(b.owner,request.user)]
     book_list = sort_books(request, book_list)
-    context = {'book_list':book_list, 'subhead': 'In group {}'.format(group.name)}
+    context = {'book_list':book_list, 'subhead': 'In genre {}'.format(cat.category)}
     return render(request, 'lib/booksublist.html', context)
 
 @login_required
@@ -283,6 +307,10 @@ def signup(request):
             selfgroup.save()
             selfgroup.user_set.add(user)
             user = authenticate(username=request.POST['username'], password=request.POST['password'])
+            try:
+                send_mail('New user', '{} \n {} {} \n {}'.format(user.username,user.first_name,user.last_name,user.email), 'admin@mikejarrett.ca', ['msjarrett@gmail.com'], fail_silently=False)
+            except:
+                print("Notification email failed")
             if user is not None:
                 login(request, user)
                 return joingroup(request)
