@@ -34,6 +34,32 @@
 
 <p>Summary: {{book.description}}</p>
 <a href="{{book.preview}}">Google Books Preview</a>
+<br />
+
+{% if comments %}
+<h3>Comments:</h3>
+{% for comment in comments %}
+<div class='comment' style='background:lightgreen'>
+{{comment.text}}<br />
+</div>
+Posted by {{comment.user.first_name}} {{comment.user.last_name.0}} <br /><br />
+{% endfor %}
+{% endif %}
+
+{% if commentform %}
+<form  action="{% url 'lib:book' book.id %}" method="post">
+{% csrf_token %}
+
+{{commentform.text}}
+<br />
+{{commentform.notifyowner}}
+Notify the book owner of this comment
+
+<br />
+<input type="submit" value="Submit comment" name="commentsub" />
+</form>
+{% endif %}
+
 {% else %}
 <p>You do not have permission to view this book</p>
 {% endif %}

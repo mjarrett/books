@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.db.models import Q
 
 from django.contrib.auth.models import User, Group
-from lib.models import Book, Category, Location, UserForm, GroupForm, EditBookForm
+from lib.models import Book, Category, Location, UserForm, GroupForm, EditBookForm, CommentForm
 
 import group_codes
 import requests
@@ -112,12 +112,25 @@ def booksview(request):
 @login_required
 def bookview(request,pk):
     book = Book.objects.get(id=pk)
+
+    if request.method == 'POST' and 'commentsub' in request.POST:
+        form = CommentForm(request.POST)
+        comment = form.save(commit=False)
+        comment.book = book
+        comment.user = request.user
+        comment.is_active = True
+        comment.save()
+        print(comment.user)
+        if request.POST.get('notifyowner', False):
+            print('send email')
+
     catstring = ", ".join([ cat.category for cat in book.category.all() ])
     if is_group_match(book.owner,request.user):
+        comments = book.comment_set.all()
         if book.owner == request.user:
-            context = {'book':book, 'isowner':True, 'catstring':catstring}
+            context = {'book':book, 'isowner':True, 'catstring':catstring, 'commentform':CommentForm(), 'comments':comments}
         else:
-            context = {'book':book, 'isowner':False, 'catstring':catstring}
+            context = {'book':book, 'isowner':False, 'catstring':catstring, 'commentform':CommentForm(), 'comments':comments}
     else:
         context = {}
     return render(request, 'lib/book.html', context)

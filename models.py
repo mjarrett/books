@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import User, Group
-from django.forms import Form, ModelForm, CharField, PasswordInput
+from django.forms import Form, ModelForm, CharField, PasswordInput, BooleanField
 from django.utils import timezone
 # Create your models here.
 
@@ -38,6 +38,13 @@ class Category(models.Model):
         return self.category
 
 
+class Comment(models.Model):
+    text = models.TextField(max_length=2000)
+    date_created = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+
 # Model Forms
 class UserForm(ModelForm):
     password = CharField(widget=PasswordInput())
@@ -57,6 +64,11 @@ class EditBookForm(ModelForm):
         #help_texts = {}
     formcategory = CharField(max_length=200, required=False)
 
+class CommentForm(ModelForm):
+    class Meta:
+        model=Comment
+        fields = ['text','notifyowner']
+    notifyowner = BooleanField(required=False,initial=False)
 
 # class Choice(models.Model):
 #     question = models.ForeignKey(Question, on_delete=models.CASCADE)
