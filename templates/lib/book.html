@@ -37,7 +37,7 @@
 {% if comments %}
 <h3>Comments:</h3>
 {% for comment in comments %}
-<div class='comment' style='background:lightgreen'>
+<div class='comment'>
 {{comment.text}}<br />
 </div>
 Posted by {{comment.user.first_name}} {{comment.user.last_name.0}} <br /><br />
