@@ -22,7 +22,21 @@ from subprocess import Popen, PIPE
 #Login and logout views handled automatically from urls.py
 
 # Non-view helper functions
+def send_mail(mailto,subject,body):
+#def send_mail():
+    #html = MIMEText("<html><head><title>Test Email</title></head><body>Some HTML</body>", "html")
+    #msg = MIMEMultipart("alternative")
 
+    msg = MIMEText(body)
+
+    msg["From"] = "library@mikejarrett.ca"
+    msg["To"] = ", ".join(["msjarrett@gmail.com",mailto])
+    msg["Subject"] = subject
+
+    #msg.attach(html)
+
+    p = Popen(["/usr/bin/sendmail", "-t"], stdin=PIPE)
+    p.communicate(msg.as_string())
 
 def sort_by_attribute(object_list,att,rev):
     if rev=="True": rev=True
@@ -36,9 +50,9 @@ def sort_by_attribute(object_list,att,rev):
             try:
                 return obj.category.all()[0].category
             except:
-                return ""        
+                return ""
         return sorted(object_list, key=lambda x:catornone(x), reverse=rev)
-    
+
     else:
         return sorted(object_list, key=lambda x: getattr(x,att), reverse=rev)
 
@@ -99,11 +113,11 @@ def addbook(request,googleid):
         b.description = volinfo['description']
     if 'previewLink' in volinfo:
         b.preview = volinfo['previewLink']
-        
+
 
     b.save()
     print(b, b.id)
-    
+
     user = request.user
     user.book.add(b)
     try:
@@ -146,10 +160,13 @@ def bookview(request,pk):
         comment.user = request.user
         comment.is_active = True
         comment.save()
-        print(comment.user)
         if request.POST.get('notifyowner', False):
             print('send email')
-
+            try:
+                send_mail(book.owner.email,'Someone commented on your book!','{} {} post a comment about one of your books:\n {}'.format(comment.user.first_name,comment.user.last_name,comment.text))
+                print('email sent successfully')
+            except:
+                print('email failed')
     catstring = ", ".join([ cat.category for cat in book.category.all() ])
     if is_group_match(book.owner,request.user):
         comments = book.comment_set.all()
@@ -247,25 +264,11 @@ def groupsview(request):
     context = {'object_list':object_list}
     return render(request, 'lib/groups.html', context)
 
-def send_mail(mailto,subject,body):
-#def send_mail():
-    #html = MIMEText("<html><head><title>Test Email</title></head><body>Some HTML</body>", "html")
-    #msg = MIMEMultipart("alternative")
 
-    msg = MIMEText(body)
-    
-    msg["From"] = "admin@mikejarrett.ca"
-    msg["To"] = ", ".join(["msjarrett@gmail.com",mailto])
-    msg["Subject"] = subject
-
-    #msg.attach(html)
-
-    p = Popen(["/usr/bin/sendmail", "-t"], stdin=PIPE)
-    p.communicate(msg.as_string())
 
 @login_required
 def groupview(request,pk):
-    
+
     group = Group.objects.get(id=pk)
     book_list = [book for book in Book.objects.all() if group in book.owner.groups.all()]
     book_list = sort_books(request, book_list)
