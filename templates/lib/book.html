@@ -50,9 +50,10 @@ Posted by {{comment.user.first_name}} {{comment.user.last_name.0}} <br /><br />
 
 {{commentform.text}}
 <br />
+{% if book.owner != request.user %}
 {{commentform.notifyowner}}
 Notify the book owner of this comment
-
+{% endif %}
 <br />
 <input type="submit" value="Submit comment" name="commentsub" />
 </form>
