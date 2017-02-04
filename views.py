@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login
 from django.db.models import Q
-from django.core.mail import send_mail
 
 
 from django.contrib.auth.models import User, Group
@@ -14,6 +13,11 @@ from lib.models import Book, Category, Location, UserForm, GroupForm, EditBookFo
 import group_codes
 import requests
 import json
+
+
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from subprocess import Popen, PIPE
 
 #Login and logout views handled automatically from urls.py
 
@@ -230,8 +234,25 @@ def groupsview(request):
     context = {'object_list':object_list}
     return render(request, 'lib/groups.html', context)
 
+def send_mail(mailto,subject,body):
+#def send_mail():
+    #html = MIMEText("<html><head><title>Test Email</title></head><body>Some HTML</body>", "html")
+    #msg = MIMEMultipart("alternative")
+
+    msg = MIMEText(body)
+    
+    msg["From"] = "admin@mikejarrett.ca"
+    msg["To"] = ", ".join(["msjarrett@gmail.com",mailto])
+    msg["Subject"] = subject
+
+    #msg.attach(html)
+
+    p = Popen(["/usr/bin/sendmail", "-t"], stdin=PIPE)
+    p.communicate(msg.as_string())
+
 @login_required
 def groupview(request,pk):
+    
     group = Group.objects.get(id=pk)
     book_list = [book for book in Book.objects.all() if group in book.owner.groups.all()]
     book_list = sort_books(request, book_list)
@@ -295,7 +316,9 @@ def signup(request):
             selfgroup.user_set.add(user)
             user = authenticate(username=request.POST['username'], password=request.POST['password'])
             try:
-                send_mail('New user', '{} \n {} {} \n {}'.format(user.username,user.first_name,user.last_name,user.email), 'admin@mikejarrett.ca', ['msjarrett@gmail.com'], fail_silently=False)
+                body =  'Username: {} \n Name: {} {} \n Email: {}'.format(user.username,user.first_name,user.last_name,user.email)
+                send_mail('msjarrett@gmail.com','New User',body)
+
             except:
                 print("Notification email failed")
             if user is not None:
