@@ -4,7 +4,7 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login
-from django.db.models import Q
+from django.core.urlresolvers import reverse
 
 
 from django.contrib.auth.models import User, Group
@@ -162,8 +162,11 @@ def bookview(request,pk):
         comment.save()
         if request.POST.get('notifyowner', False):
             print('send email')
+            body = '{} {} posted a comment about your book <a href="http://apps.mikejarrett.ca{}">{}</a>:\n\n {} \n\n '.format(comment.user.first_name,comment.user.last_name, reverse('lib:book',args=(book.id,)),book.title,comment.text)
+            print(body)
+
             try:
-                send_mail(book.owner.email,'Someone commented on your book!','{} {} post a comment about one of your books:\n {}'.format(comment.user.first_name,comment.user.last_name,comment.text))
+                send_mail(book.owner.email, 'Someone commented on your book!',body)
                 print('email sent successfully')
             except:
                 print('email failed')
