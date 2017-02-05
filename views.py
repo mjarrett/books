@@ -22,18 +22,23 @@ from subprocess import Popen, PIPE
 #Login and logout views handled automatically from urls.py
 
 # Non-view helper functions
-def send_mail(mailto,subject,body):
+def send_mail(mailto,subject,body,html):
 #def send_mail():
     #html = MIMEText("<html><head><title>Test Email</title></head><body>Some HTML</body>", "html")
     #msg = MIMEMultipart("alternative")
 
-    msg = MIMEText(body)
+    #msg = MIMEText(body)
+    msg = MIMEMultipart('alternative')
 
     msg["From"] = "library@mikejarrett.ca"
     msg["To"] = ", ".join(["msjarrett@gmail.com",mailto])
     msg["Subject"] = subject
 
-    #msg.attach(html)
+    part1 = MIMEText(body)
+    part2 = MIMETest(html)
+
+    msg.attach(part1)
+    msg.attach(part2)
 
     p = Popen(["/usr/bin/sendmail", "-t"], stdin=PIPE)
     p.communicate(msg.as_string())
@@ -162,11 +167,12 @@ def bookview(request,pk):
         comment.save()
         if request.POST.get('notifyowner', False):
             print('send email')
-            body = '{} {} posted a comment about your book <a href="http://apps.mikejarrett.ca{}">{}</a>:\n\n {} \n\n '.format(comment.user.first_name,comment.user.last_name, reverse('lib:book',args=(book.id,)),book.title,comment.text)
+            body = '{} {} posted a comment about your book {} (http://apps.mikejarrett.ca{}):\n\n {} \n\n '.format(comment.user.first_name,comment.user.last_name,book.title, reverse('lib:book',args=(book.id,)),comment.text)
+            html = '{} {} posted a comment about your book <a href="http://apps.mikejarrett.ca{}">{}</a>:\n\n {} \n\n '.format(comment.user.first_name,comment.user.last_name, reverse('lib:book',args=(book.id,)),book.title,comment.text)
             print(body)
-
+            print(html)
             try:
-                send_mail(book.owner.email, 'Someone commented on your book!',body)
+                send_mail(book.owner.email, 'Someone commented on your book!',body,html)
                 print('email sent successfully')
             except:
                 print('email failed')
