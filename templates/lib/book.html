@@ -42,7 +42,7 @@
 <div class='comment'>
 {{comment.text|linebreaks}}
 </div>
-Posted by {{comment.user.first_name}} {{comment.user.last_name.0}} <br /><br />
+Posted by {{comment.user.first_name}} {{comment.user.last_name.0}} on {{comment.date_created|date:"M d, Y"}}<br /><br />
 {% endfor %}
 {% endif %}
 
