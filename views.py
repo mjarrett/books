@@ -34,8 +34,8 @@ def send_mail(mailto,subject,body,html):
     msg["To"] = ", ".join(["msjarrett@gmail.com",mailto])
     msg["Subject"] = subject
 
-    part1 = MIMEText(body)
-    part2 = MIMETest(html)
+    part1 = MIMEText(body, 'plain')
+    part2 = MIMEText(html, 'html')
 
     msg.attach(part1)
     msg.attach(part2)
@@ -154,10 +154,23 @@ def booksview(request):
     context = {'book_list':book_list, 'subhead': 'All books available to you'}
     return render(request, 'lib/booksublist.html', context)
 
+
+def test_mail():
+    send_mail('','Test','test',"""\
+<html>
+<head></head>
+<body>
+<b>test2</b>
+</body>
+</html>
+    """)
+
 @login_required
 def bookview(request,pk):
     book = Book.objects.get(id=pk)
 
+    #test_mail()
+    
     if request.method == 'POST' and 'commentsub' in request.POST:
         form = CommentForm(request.POST)
         comment = form.save(commit=False)
@@ -168,7 +181,7 @@ def bookview(request,pk):
         if request.POST.get('notifyowner', False):
             print('send email')
             body = '{} {} posted a comment about your book {} (http://apps.mikejarrett.ca{}):\n\n {} \n\n '.format(comment.user.first_name,comment.user.last_name,book.title, reverse('lib:book',args=(book.id,)),comment.text)
-            html = '{} {} posted a comment about your book <a href="http://apps.mikejarrett.ca{}">{}</a>:\n\n {} \n\n '.format(comment.user.first_name,comment.user.last_name, reverse('lib:book',args=(book.id,)),book.title,comment.text)
+            html = '{} {} posted a comment about your book <a href="http://apps.mikejarrett.ca{}">{}</a>:<br><br> {} \n\n '.format(comment.user.first_name,comment.user.last_name, reverse('lib:book',args=(book.id,)),book.title,comment.text)
             print(body)
             print(html)
             try:
