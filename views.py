@@ -31,7 +31,7 @@ def send_mail(mailto,subject,body,html):
     msg = MIMEMultipart('alternative')
 
     msg["From"] = "library@mikejarrett.ca"
-    msg["To"] = ", ".join(["msjarrett@gmail.com",mailto])
+    msg["To"] = mailto
     msg["Subject"] = subject
 
     part1 = MIMEText(body, 'plain')
@@ -179,10 +179,18 @@ def bookview(request,pk):
         comment.user = request.user
         comment.is_active = True
         comment.save()
+
+        body = '{} {} posted a comment about your book {} (http://apps.mikejarrett.ca{}):\n\n {} \n\n '.format(comment.user.first_name,comment.user.last_name,book.title, reverse('lib:book',args=(book.id,)),comment.text)
+        html = '{} {} posted a comment about your book <a href="http://apps.mikejarrett.ca{}">{}</a>:<br><br> {} \n\n '.format(comment.user.first_name,comment.user.last_name, reverse('lib:book',args=(book.id,)),book.title,comment.text)
+        try:
+            send_mail('admin@mikejarrett.ca','New comment in library',body,html)
+            print("Admin email sent succesfully")
+        except:
+            print("Admin email failed")
+
         if request.POST.get('notifyowner', False):
             print('send email')
-            body = '{} {} posted a comment about your book {} (http://apps.mikejarrett.ca{}):\n\n {} \n\n '.format(comment.user.first_name,comment.user.last_name,book.title, reverse('lib:book',args=(book.id,)),comment.text)
-            html = '{} {} posted a comment about your book <a href="http://apps.mikejarrett.ca{}">{}</a>:<br><br> {} \n\n '.format(comment.user.first_name,comment.user.last_name, reverse('lib:book',args=(book.id,)),book.title,comment.text)
+
             print(body)
             print(html)
             try:
@@ -199,7 +207,7 @@ def bookview(request,pk):
                 print(body)
                 print(html)
                 try:
-                    send_mail(previous_commenter.email, 'Someone commented on your book!',body,html)
+                    send_mail(previous_commenter.email, "Someone commented on a book you're interested in!",body,html)
                     print('email sent successfully')
                 except:
                     print('email failed')
