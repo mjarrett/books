@@ -170,8 +170,9 @@ def bookview(request,pk):
     book = Book.objects.get(id=pk)
 
     #test_mail()
-    
+    ### POST COMMENT SECTION
     if request.method == 'POST' and 'commentsub' in request.POST:
+        previous_commenters = [ x.user for x in book.comment_set.all() if x.user != request.user]
         form = CommentForm(request.POST)
         comment = form.save(commit=False)
         comment.book = book
@@ -189,6 +190,21 @@ def bookview(request,pk):
                 print('email sent successfully')
             except:
                 print('email failed')
+
+        if len(previous_commenters) > 0:
+            for previous_commenter in previous_commenters:
+                print('send email to previous commenters')
+                body = "{} {} posted a comment about a book you've also commented on {} (http://apps.mikejarrett.ca{}):\n\n {} \n\n ".format(comment.user.first_name,comment.user.last_name,book.title, reverse('lib:book',args=(book.id,)),comment.text)
+                html = "{} {} posted a comment about a book you've also commented on <a href='http://apps.mikejarrett.ca{}'>{}</a>:<br><br> {}  ".format(comment.user.first_name,comment.user.last_name, reverse('lib:book',args=(book.id,)),book.title,comment.text)
+                print(body)
+                print(html)
+                try:
+                    send_mail(previous_commenter.email, 'Someone commented on your book!',body,html)
+                    print('email sent successfully')
+                except:
+                    print('email failed')
+
+    ### END POST COMMENT SECTION
     catstring = ", ".join([ cat.category for cat in book.category.all() ])
     if is_group_match(book.owner,request.user):
         comments = book.comment_set.all()
